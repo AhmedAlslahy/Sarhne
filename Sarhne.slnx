@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Sarhne.API/Sarhne.API.csproj" />
+  <Project Path="Sarhne.BLL/Sarhne.BLL.csproj" />
+  <Project Path="Sarhne.DAL/Sarhne.DAL.csproj" />
+</Solution>

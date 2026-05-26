@@ -1,0 +1,15 @@
+D:\projects .net\Sarhne\Sarhne.BLL\bin\Debug\net10.0\Sarhne.BLL.deps.json
+D:\projects .net\Sarhne\Sarhne.BLL\bin\Debug\net10.0\Sarhne.BLL.dll
+D:\projects .net\Sarhne\Sarhne.BLL\bin\Debug\net10.0\Sarhne.BLL.pdb
+D:\projects .net\Sarhne\Sarhne.BLL\bin\Debug\net10.0\Sarhne.DAL.dll
+D:\projects .net\Sarhne\Sarhne.BLL\bin\Debug\net10.0\Sarhne.DAL.pdb
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.csproj.AssemblyReference.cache
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.GeneratedMSBuildEditorConfig.editorconfig
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.AssemblyInfoInputs.cache
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.AssemblyInfo.cs
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.csproj.CoreCompileInputs.cache
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.csproj.Up2Date
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.dll
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\refint\Sarhne.BLL.dll
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\Sarhne.BLL.pdb
+D:\projects .net\Sarhne\Sarhne.BLL\obj\Debug\net10.0\ref\Sarhne.BLL.dll
