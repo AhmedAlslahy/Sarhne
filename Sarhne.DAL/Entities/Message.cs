@@ -9,7 +9,7 @@ namespace Sarhne.DAL.Entities
         public string? PhotoUrl { get; set;}
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; }
-        public bool IsStared { get; set; }
+        public bool IsStarred { get; set; }
 
 
         //Relations

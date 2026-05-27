@@ -5,9 +5,9 @@ namespace Sarhne.DAL.Entities
     public class UserSetting
     {
         public int Id { get; set; }
-        public bool AllowAnonymousMessages { get; set; } = true;
-        public bool ShowLastSeen { get; set; } = true;
-        public bool ShowProfileViews { get; set; } = false;
+        public bool AllowAnonymousMessages { get; set; }
+        public bool ShowLastSeen { get; set; }
+        public bool ShowProfileViews { get; set; }
 
 
         //Relations
