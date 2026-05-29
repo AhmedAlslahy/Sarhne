@@ -1,6 +1,6 @@
 ﻿
 global using Microsoft.AspNetCore.Identity;
-using static Sarhne.DAL.Enums.Enums;
+using Sarhne.DAL.Enums;
 namespace Sarhne.DAL.Entities
 {
     public class User : IdentityUser

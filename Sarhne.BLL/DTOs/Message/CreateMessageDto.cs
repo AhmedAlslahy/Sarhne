@@ -1,0 +1,12 @@
+﻿
+using Microsoft.AspNetCore.Http;
+namespace Sarhne.BLL.DTOs.Message
+{
+    public class CreateMessageDto
+    {
+        public string? Content { get; set; }
+        public string? PhotoUrl { get; set; }
+        public IFormFile? Photo { get; set; }
+        public string ReceiverId { get; set; } = string.Empty;
+    }
+}

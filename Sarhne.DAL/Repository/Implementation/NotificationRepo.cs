@@ -16,7 +16,6 @@ namespace Sarhne.DAL.Repository.Implementation
         public async Task CreateAsync(Notification notification)
         {
             await _context.Notifications.AddAsync(notification);
-            await _context.SaveChangesAsync();
         }
 
         public IQueryable<Notification> GetAllByUserId(string userId)
@@ -24,9 +23,13 @@ namespace Sarhne.DAL.Repository.Implementation
             return _context.Notifications.Where(n => n.ReceiverId == userId).AsNoTracking();
         }
 
-        public Task<int> UnreadCountByUserIdAsync(string userId)
+        public Task<Notification?> GetById(int id , string userId , CancellationToken cancellation = default)
         {
-            return _context.Notifications.CountAsync(n => n.ReceiverId == userId && !n.IsRead);
+            return _context.Notifications.FirstOrDefaultAsync(n => n.Id == id && n.ReceiverId ==userId, cancellation);
+        }
+        public async Task<int> UnreadCountByUserIdAsync(string userId, CancellationToken cancellation = default)
+        {
+            return await _context.Notifications.CountAsync(n => n.ReceiverId == userId && !n.IsRead,cancellation);
         }
     }
 }

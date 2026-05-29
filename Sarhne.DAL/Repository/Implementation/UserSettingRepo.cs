@@ -14,17 +14,13 @@ namespace Sarhne.DAL.Repository.Implementation
             _context = context;
         }
 
-       public Task<UserSetting?> GetByUserIdAsync(string userId)
+       public async Task<UserSetting?> GetByUserIdAsync(string userId, CancellationToken cancellation = default)
         {
-            return _context.UserSettings.FirstOrDefaultAsync(x => x.UserId == userId);
+            return await _context.UserSettings.FirstOrDefaultAsync(x => x.UserId == userId, cancellation);
         }
-        public async Task UpdateAsync(UserSetting userSetting)
+        public void Update(UserSetting userSetting)
         {
-            await _context.UserSettings.Where(n=>n.UserId==userSetting.UserId)
-                .ExecuteUpdateAsync(setter => setter
-                .SetProperty(n=>n.ShowProfileViews , userSetting.ShowProfileViews)
-                .SetProperty(n => n.AllowAnonymousMessages , userSetting.AllowAnonymousMessages)
-                .SetProperty(n => n.ShowLastSeen , userSetting.ShowLastSeen));
+            _context.UserSettings.Update(userSetting);
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿using Sarhne.DAL.Enums;
+using static Sarhne.BLL.Abstraction.Errors;
+
+namespace Sarhne.BLL.Errors
+{
+    public class UserErrors
+    {
+        public static Error NotFound
+            = new Error("User.NotFound", "User was not found", ErrorType.NotFound);
+
+        public static Error InvalidData
+           = new Error("User.InvalidData", "Invalid user data", ErrorType.BadRequest);
+
+        public static Error Unauthorized
+           = new Error("User.Unauthorized", "Invalid email or password", ErrorType.Unauthorized);
+    }
+}

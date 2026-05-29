@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Sarhne.DAL.Database;
 using Sarhne.DAL.Entities;
+using Sarhne.DAL.Repository.Implementation;
+using Sarhne.DAL.Repository.Interfaces;
 
 
 namespace Sarhne.API
@@ -38,6 +40,7 @@ namespace Sarhne.API
 
 
             // Add services to the container.
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

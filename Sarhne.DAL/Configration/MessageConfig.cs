@@ -28,7 +28,7 @@ namespace Sarhne.DAL.Configration
             builder.Property(m => m.IsRead)
                 .HasDefaultValue(false);
 
-            builder.Property(m => m.IsStared)
+            builder.Property(m => m.IsStarred)
                .HasDefaultValue(false);
         }
     }

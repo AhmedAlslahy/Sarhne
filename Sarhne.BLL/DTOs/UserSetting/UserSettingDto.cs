@@ -1,0 +1,11 @@
+﻿
+
+namespace Sarhne.BLL.DTOs.UserSetting
+{
+    public class UserSettingDto
+    {
+        public bool AllowAnonymousMessages { get; set; }
+        public bool ShowLastSeen { get; set; }
+        public bool ShowProfileViews { get; set; }
+    }
+}
