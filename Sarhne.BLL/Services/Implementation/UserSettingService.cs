@@ -1,11 +1,11 @@
 ﻿using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.UserSetting;
 using Sarhne.BLL.Errors;
-using Sarhne.BLL.Service.Interfaces;
+using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Repository.Interfaces;
 
 
-namespace Sarhne.BLL.Service.Implementation
+namespace Sarhne.BLL.Services.Implementation
 {
     public class UserSettingService : IUserSettingService
     {

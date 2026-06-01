@@ -2,7 +2,7 @@
 using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.UserSetting;
 
-namespace Sarhne.BLL.Service.Interfaces
+namespace Sarhne.BLL.Services.Interfaces
 {
     public interface IUserSettingService
     {

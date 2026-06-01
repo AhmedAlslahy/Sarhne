@@ -21,10 +21,6 @@ namespace Sarhne.BLL.Services.Implementation
 
         public async Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation = default)
         {
-            if (string.IsNullOrWhiteSpace(dto.Content) && dto.Photo == null)
-            {
-                return Response.Fail(MessageErrors.InvalidData);
-            }
             //create Message
             var messageData = new Message { 
             Content = dto.Content,
@@ -50,7 +46,7 @@ namespace Sarhne.BLL.Services.Implementation
             }
             else if (dto.Photo != null)
             {
-                dataNotification.Body = "📷 Sent an image";
+                dataNotification.Body = "Sent an image";
             }
             
             await _unitOfWork.Messages.CreateAsync(messageData);

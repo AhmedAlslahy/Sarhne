@@ -12,6 +12,8 @@ namespace Sarhne.DAL.Entities
         public string? ProfileDescription { get; set; }
         public DateTime? LastSeen { get; set; }
         public int ProfileViewsCount { get; set; }
+        public string? OTP { get; set; } 
+        public DateTime? OTPExpire {  get; set; } 
 
         //Relations
         public UserSetting UserSetting { get; set; } = null!;

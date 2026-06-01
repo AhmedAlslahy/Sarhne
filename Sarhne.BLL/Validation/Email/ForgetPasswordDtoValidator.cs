@@ -1,0 +1,26 @@
+﻿using FluentValidation;
+using Sarhne.BLL.DTOs.Email;
+
+namespace Sarhne.BLL.Validation.Email
+{
+    public class ForgetPasswordDtoValidator : AbstractValidator<ForgetPasswordDto>
+    {
+        public ForgetPasswordDtoValidator()
+        {
+            RuleFor(x => x.UserId)
+                .NotEmpty()
+                .WithMessage("UserId is required.");
+
+            RuleFor(x => x.OTP)
+                .NotEmpty()
+                .WithMessage("OTP is required.")
+                .Matches(@"^\d{6}$");
+
+            RuleFor(x => x.NewPassword)
+                .NotEmpty()
+                .WithMessage("Password is required.")
+                .MinimumLength(8)
+                .WithMessage("Password must be at least 8 characters.");
+        }
+    }
+}

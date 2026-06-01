@@ -22,7 +22,7 @@ namespace Sarhne.DAL.Configration
                 .IsRequired(false);
 
             builder.Property(u => u.PublicLink)
-                .HasMaxLength(300)
+                .HasMaxLength(100)
                 .IsRequired(false);
 
             builder.Property(u => u.ProfileDescription)
