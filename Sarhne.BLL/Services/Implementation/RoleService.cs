@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Sarhne.BLL.Abstraction;
+using Microsoft.EntityFrameworkCore;
 using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Enums;
@@ -16,9 +17,15 @@ namespace Sarhne.BLL.Services.Implementation
             _roleManager = roleManager;
         }
 
-        public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
+        public async Task<Response<IEnumerable<IdentityRole>>> GetAllRolesAsync()
         {
-            return await Task.FromResult(_roleManager.Roles.ToList());
+            var roles = await _roleManager.Roles.ToListAsync();
+            if (!roles.Any())
+            {
+                return Response<IEnumerable<IdentityRole>>
+                    .Fail(RoleErrors.NotFound);
+            }
+            return Response<IEnumerable<IdentityRole>>.Success(roles);
         }
 
         public async Task<Response> CreateRoleAsync(string roleName)

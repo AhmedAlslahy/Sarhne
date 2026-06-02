@@ -35,6 +35,10 @@ namespace Sarhne.BLL.Services.Implementation
 
        public async Task<Response> Update(UpdateUserSettingDto dto, string userId, CancellationToken cancellation = default)
         {
+            if (dto == null)
+            {
+                return Response.Fail(UserErrors.InvalidSettingData);
+            }
             var result = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
             if (result == null)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Message;
 using Sarhne.BLL.Errors;
@@ -6,6 +7,7 @@ using Sarhne.BLL.Helper;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Repository.Interfaces;
+using static Sarhne.BLL.Helper.HelperMethod;
 
 
 namespace Sarhne.BLL.Services.Implementation
@@ -13,14 +15,23 @@ namespace Sarhne.BLL.Services.Implementation
     public class MessageService : IMessageService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public MessageService(IUnitOfWork _unitOfWork)
+        private readonly IValidator<CreateMessageDto> _createValidator;
+        public MessageService(IUnitOfWork _unitOfWork, IValidator<CreateMessageDto> _createValidator)
         {
             this._unitOfWork = _unitOfWork;
+            this._createValidator = _createValidator;
         }
 
         public async Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation = default)
         {
+            var validationResult = await _createValidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
+            {
+                return Response.Fail(error);
+            }
             //create Message
             var messageData = new Message { 
             Content = dto.Content,

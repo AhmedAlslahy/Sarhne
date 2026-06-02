@@ -33,10 +33,12 @@ namespace Sarhne.DAL.Migrations
                     FullName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    PublicLink = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    PublicLink = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ProfileDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     LastSeen = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ProfileViewsCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    OTP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPExpire = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -173,7 +175,7 @@ namespace Sarhne.DAL.Migrations
                     PhotoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     IsRead = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    IsStared = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsStarred = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>

@@ -1,27 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Notification;
 using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Repository.Interfaces;
+using static Sarhne.BLL.Helper.HelperMethod;
 
 namespace Sarhne.BLL.Services.Implementation
 {
     public class NotificationService : INotificationService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public NotificationService(IUnitOfWork _unitOfWork)
+        private readonly IValidator<CreateNotificationDto> _createValidator;
+        public NotificationService(IUnitOfWork _unitOfWork, IValidator<CreateNotificationDto> _createValidator)
         {
             this._unitOfWork = _unitOfWork;
+            this._createValidator = _createValidator;
         }
 
         public async Task<Response> Create(CreateNotificationDto dto, CancellationToken cancellation = default)
         {
-            if(dto == null)
+            var validationResult = await _createValidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
             {
-                return Response.Fail(NotificationErrors.InvalidData);
+                return Response.Fail(error);
             }
 
             var data = new Notification { 

@@ -13,5 +13,8 @@ namespace Sarhne.BLL.Errors
 
         public static Error Unauthorized
            = new Error("User.Unauthorized", "Invalid email or password", ErrorType.Unauthorized);
+
+        public static Error InvalidSettingData
+           = new Error("User.InvalidSettingData", "Invalid setting data", ErrorType.BadRequest);
     }
 }

@@ -1,4 +1,7 @@
 ﻿
+using Sarhne.DAL.Enums;
+using static Sarhne.BLL.Abstraction.Errors;
+
 namespace Sarhne.BLL.Helper
 {
    public static class HelperMethod
@@ -18,6 +21,21 @@ namespace Sarhne.BLL.Helper
                 trimmed = trimmed.Substring(0, lastSpace);
 
             return trimmed + "...";
+        }
+
+
+        public static class ValidationHelper
+        {
+            public static Error? Validate(FluentValidation.Results.ValidationResult result)
+            {
+                if (result.IsValid)
+                    return null;
+
+                return new Error(
+                    "ValidationError",
+                    string.Join(", ", result.Errors.Select(x => x.ErrorMessage)),
+                    ErrorType.BadRequest);
+            }
         }
     }
 }

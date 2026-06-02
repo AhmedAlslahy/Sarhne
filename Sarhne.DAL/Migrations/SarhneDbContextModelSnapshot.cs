@@ -177,7 +177,7 @@ namespace Sarhne.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<bool>("IsStared")
+                    b.Property<bool>("IsStarred")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -282,6 +282,12 @@ namespace Sarhne.DAL.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("OTP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OTPExpire")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -301,8 +307,8 @@ namespace Sarhne.DAL.Migrations
                         .HasDefaultValue(0);
 
                     b.Property<string>("PublicLink")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

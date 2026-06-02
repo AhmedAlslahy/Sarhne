@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.User;
 using Sarhne.BLL.Errors;
 using Sarhne.BLL.Helper;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
-using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
+using static Sarhne.BLL.Helper.HelperMethod;
 
 namespace Sarhne.BLL.Services.Implementation
 {
@@ -16,9 +15,11 @@ namespace Sarhne.BLL.Services.Implementation
     {
 
         private readonly UserManager<User> _userManager;
-        public UserService(UserManager<User> userManager)
+        private readonly IValidator<UserUpdateDto> _updateValidator;
+        public UserService(UserManager<User> userManager, IValidator<UserUpdateDto> _updateValidator)
         {
             _userManager = userManager;
+            this._updateValidator = _updateValidator;
         }
 
         public async Task<Response> AddAdminRole(string userId)
@@ -77,7 +78,7 @@ namespace Sarhne.BLL.Services.Implementation
             return Response<IEnumerable<UserDetailsDto>>.Success(data);
         }
 
-        public async Task<Response<UserDetailsDto>> GetByIdAsync(string publicLink)
+        public async Task<Response<UserDetailsDto>> GetByLinkAsync(string publicLink)
         {
             var user = _userManager.Users
                 .FirstOrDefault(u => u.PublicLink == publicLink);
@@ -99,11 +100,23 @@ namespace Sarhne.BLL.Services.Implementation
                 LastSeen = user.LastSeen,
                 ProfileViewsCount = user.ProfileViewsCount,
             };
+
+            user.ProfileViewsCount++;
+            await _userManager.UpdateAsync(user);
             return Response<UserDetailsDto>.Success(data);
         }
 
         public async Task<Response> UpdateAsync(UserUpdateDto dto)
         {
+            var validationResult = await _updateValidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
+            {
+                return Response.Fail(error);
+            }
+
             var user = await _userManager.FindByIdAsync(dto.Id);
 
             if (user == null)

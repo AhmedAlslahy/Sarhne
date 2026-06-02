@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using FluentValidation;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Sarhne.DAL.Entities;
 using Sarhne.DAL.Enums;
 using System.Security.Cryptography;
 using static Sarhne.BLL.Abstraction.Errors;
+using static Sarhne.BLL.Helper.HelperMethod;
 
 
 namespace Sarhne.BLL.Services.Implementation
@@ -21,12 +23,21 @@ namespace Sarhne.BLL.Services.Implementation
         private readonly IConfiguration _config;
         private readonly UserManager<User> _userManager;
         private readonly IWebHostEnvironment _env;
+        private readonly IValidator<ConfirmEmailDto> _confirmVlidator;
+        private readonly IValidator<ForgetPasswordDto> _forgetVlidator;
+        private readonly IValidator<ResetPasswordDto> _resetVlidator;
 
-        public EmailService(UserManager<User> userManager,IWebHostEnvironment env,IConfiguration _config)
+
+        public EmailService(UserManager<User> userManager,IWebHostEnvironment env,IConfiguration _config,
+            IValidator<ResetPasswordDto> _resetVlidator, IValidator<ForgetPasswordDto> _forgetVlidator
+            , IValidator<ConfirmEmailDto> _confirmVlidator)
         {
             _userManager = userManager;
             this._config = _config;
             _env = env;
+            this._resetVlidator = _resetVlidator;
+            this._forgetVlidator = _forgetVlidator;
+            this._confirmVlidator = _confirmVlidator;
         }
 
         public async Task<Response> EmailBody(string to, string subject, string body, CancellationToken cancellation = default)
@@ -108,6 +119,15 @@ namespace Sarhne.BLL.Services.Implementation
 
         public async Task<Response> ConfirmEmail(ConfirmEmailDto dto)
         {
+            var validationResult = await _confirmVlidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
+            {
+                return Response.Fail(error);
+            }
+
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user == null)
             {
@@ -132,6 +152,15 @@ namespace Sarhne.BLL.Services.Implementation
 
         public async Task<Response> ForgetPassword(ForgetPasswordDto dto)
         {
+            var validationResult = await _forgetVlidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
+            {
+                return Response.Fail(error);
+            }
+
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user == null)
             {
@@ -157,6 +186,15 @@ namespace Sarhne.BLL.Services.Implementation
 
         public async Task<Response> ResetPassword(ResetPasswordDto dto)
         {
+            var validationResult = await _resetVlidator.ValidateAsync(dto);
+
+            var error = ValidationHelper.Validate(validationResult);
+
+            if (error != null)
+            {
+                return Response.Fail(error);
+            }
+
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user == null)
             {
