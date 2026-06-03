@@ -7,7 +7,6 @@ using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Enums;
-using Sarhne.DAL.Repository.Interfaces;
 using static Sarhne.BLL.Abstraction.Errors;
 using static Sarhne.BLL.Helper.HelperMethod;
 

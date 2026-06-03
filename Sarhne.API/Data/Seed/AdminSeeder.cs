@@ -27,7 +27,13 @@ namespace Sarhne.API.Data.Seed
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    UserSetting = new UserSetting
+                    {
+                        AllowAnonymousMessages = true,
+                        ShowLastSeen = true,
+                        ShowProfileViews = true
+                    }
                 };
 
                 await userManager.CreateAsync(admin, "Admin@123");
