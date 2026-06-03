@@ -65,9 +65,9 @@ namespace Sarhne.BLL.Services.Implementation
             return Response.Success();
         }
 
-        public async Task<Response> SendConfirmEmailOTP(string userId, CancellationToken cancellation = default)
+        public async Task<Response> SendConfirmEmailOTP(string email, CancellationToken cancellation = default)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);
@@ -91,9 +91,9 @@ namespace Sarhne.BLL.Services.Implementation
             return Response.Success();
         }
 
-        public async Task<Response> SendForgetPasswordOTP(string userId, CancellationToken cancellation = default)
+        public async Task<Response> SendForgetPasswordOTP(string email, CancellationToken cancellation = default)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);
@@ -117,18 +117,16 @@ namespace Sarhne.BLL.Services.Implementation
             return Response.Success();
         }
 
-        public async Task<Response> ConfirmEmail(ConfirmEmailDto dto)
+        public async Task<Response> ConfirmEmail(ConfirmEmailDto dto,string userId)
         {
             var validationResult = await _confirmVlidator.ValidateAsync(dto);
-
             var error = ValidationHelper.Validate(validationResult);
-
             if (error != null)
             {
                 return Response.Fail(error);
             }
 
-            var user = await _userManager.FindByIdAsync(dto.UserId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);
@@ -150,7 +148,7 @@ namespace Sarhne.BLL.Services.Implementation
             return Response.Success();
         }
 
-        public async Task<Response> ForgetPassword(ForgetPasswordDto dto)
+        public async Task<Response> ForgetPassword(ForgetPasswordDto dto , string email)
         {
             var validationResult = await _forgetVlidator.ValidateAsync(dto);
 
@@ -161,19 +159,14 @@ namespace Sarhne.BLL.Services.Implementation
                 return Response.Fail(error);
             }
 
-            var user = await _userManager.FindByIdAsync(dto.UserId);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);
             }
             if(dto.OTP!=user.OTP || DateTime.UtcNow > user.OTPExpire)
             {
-                return Response.Fail(new Error("The OTP Is Wrong Or Expire", "Cannot Confirm Email",ErrorType.BadRequest));
-            }
-
-            if (user.EmailConfirmed)
-            {
-                return Response.Fail(new Error( "Email already confirmed", "Cannot Confirm Email",ErrorType.BadRequest));
+                return Response.Fail(new Error("The OTP Is Wrong Or Expire", "Cannot add new password",ErrorType.BadRequest));
             }
             user.OTP = null;
             user.OTPExpire = null;
@@ -184,7 +177,7 @@ namespace Sarhne.BLL.Services.Implementation
             return Response.Success();
         }
 
-        public async Task<Response> ResetPassword(ResetPasswordDto dto)
+        public async Task<Response> ResetPassword(ResetPasswordDto dto ,string userId)
         {
             var validationResult = await _resetVlidator.ValidateAsync(dto);
 
@@ -195,7 +188,7 @@ namespace Sarhne.BLL.Services.Implementation
                 return Response.Fail(error);
             }
 
-            var user = await _userManager.FindByIdAsync(dto.UserId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);

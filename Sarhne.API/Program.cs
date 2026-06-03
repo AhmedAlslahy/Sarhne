@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Sarhne.API.Data.Seed;
 using Sarhne.BLL.DTOs.Auth;
 using Sarhne.BLL.Services.Implementation;
 using Sarhne.BLL.Services.Interfaces;
@@ -18,7 +19,7 @@ namespace Sarhne.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -41,30 +42,61 @@ namespace Sarhne.API
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 8;
             })
             .AddEntityFrameworkStores<SarhneDbContext>();
+            //---------------------------------------------------------------------------------------------
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("MyPolicy", policy =>
+                {
+                    policy
+                        .WithOrigins()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+            //-----------------------------------------------------------------------------
 
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme=JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme=JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme=JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
-            {
-                options.SaveToken= true;
+             {
+                options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer= builder.Configuration["JWTInformations:issuerIP"],
-                    ValidateAudience = true,
-                    ValidAudience= builder.Configuration["JWTInformations:audienceIP"],
-                    IssuerSigningKey = 
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTInformations:SecretKey"])),
-                };
-            });
+
+              options.TokenValidationParameters = new TokenValidationParameters
+               {
+                  ValidateIssuer = true,
+                 ValidIssuer = builder.Configuration["JWTInformations:issuerIP"],
+
+                 ValidateAudience = true,
+                 ValidAudience = builder.Configuration["JWTInformations:audienceIP"],
+
+                  ValidateIssuerSigningKey = true,
+ 
+                   ValidateLifetime = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                      Encoding.UTF8.GetBytes(builder.Configuration["JWTInformations:SecretKey"])
+                     ),
+
+                   ClockSkew = TimeSpan.Zero
+                   };
+
+                 options.Events = new JwtBearerEvents
+                   {
+                   OnMessageReceived = context =>
+                     {
+                       context.Token = context.Request.Cookies["jwt"];
+                        return Task.CompletedTask;
+         }
+     };
+ });
 
             //---------------------------------------------------------------------------------------------------------------
 
@@ -99,24 +131,37 @@ namespace Sarhne.API
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddEndpointsApiExplorer();
-
+            builder.Services.AddOpenApi();
+            builder.Services.AddSwaggerGen();
 
             //---------------------------------------------------------------------------------------------------------------------
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                var roleSeeder = new RoleSeeder(services);
+                await roleSeeder.SeedAsync();
+
+                var adminSeeder = new AdminSeeder(services);
+                await adminSeeder.SeedAsync();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                //app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles();
+            app.UseCors("MyPolicy");
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();

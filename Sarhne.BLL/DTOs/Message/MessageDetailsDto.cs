@@ -10,6 +10,5 @@ namespace Sarhne.BLL.DTOs.Message
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; }
         public bool IsStarred { get; set; }
-        public string ReceiverId { get; set; } = string.Empty;
     }
 }

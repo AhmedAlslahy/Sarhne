@@ -49,7 +49,6 @@ namespace Sarhne.BLL.Services.Implementation
             result.ShowLastSeen = dto.ShowLastSeen;
             result.ShowProfileViews = dto.ShowProfileViews;
 
-            _unitOfWork.UserSettings.Update(result);
             await _unitOfWork.SaveChangesAsync(cancellation);
             return Response.Success();
         } 

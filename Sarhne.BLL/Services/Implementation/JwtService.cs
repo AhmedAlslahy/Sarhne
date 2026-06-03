@@ -23,7 +23,7 @@ namespace Sarhne.BLL.Services.Implementation
         public async Task<Response<GenerateTokenResDto>> GenerateToken(User user, IList<string> roles)
         {
             List<Claim> UserClaims = new List<Claim>();
-            UserClaims.Add(new Claim(ClaimTypes.Name, user.FullName));
+            UserClaims.Add(new Claim(ClaimTypes.Name, user.UserName));
             UserClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
             UserClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             foreach (var role in roles)

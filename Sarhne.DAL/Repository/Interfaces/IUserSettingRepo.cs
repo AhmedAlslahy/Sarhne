@@ -7,6 +7,7 @@ namespace Sarhne.DAL.Repository.Interfaces
     public interface IUserSettingRepo
     {
         Task<UserSetting> GetByUserIdAsync(string userId, CancellationToken cancellation = default);
-        void Update(UserSetting userSetting);
+        //Task Update(UserSetting userSetting);
+        //Task CreateAsync(UserSetting userSetting);
     }
 }

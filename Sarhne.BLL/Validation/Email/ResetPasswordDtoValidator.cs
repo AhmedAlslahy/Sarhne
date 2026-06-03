@@ -8,9 +8,6 @@ namespace Sarhne.BLL.Validation.Email
     {
         public ResetPasswordDtoValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty();
-
             RuleFor(x => x.CurrentPassword)
                 .NotEmpty()
                 .WithMessage("Current password is required.");

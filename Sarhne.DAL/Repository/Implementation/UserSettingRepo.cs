@@ -18,9 +18,15 @@ namespace Sarhne.DAL.Repository.Implementation
         {
             return await _context.UserSettings.FirstOrDefaultAsync(x => x.UserId == userId, cancellation);
         }
-        public void Update(UserSetting userSetting)
-        {
-            _context.UserSettings.Update(userSetting);
-        }
+
+
+        //public async Task Update(UserSetting userSetting)
+        //{
+        //    _context.UserSettings.Update(userSetting);
+        //}
+        //public async Task CreateAsync(UserSetting userSetting)
+        //{
+        //   await _context.UserSettings.AddAsync(userSetting);
+        //}
     }
 }

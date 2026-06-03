@@ -8,6 +8,9 @@ namespace Sarhne.BLL.Errors
         public static Error NotFound
             = new Error("User.NotFound", "User was not found", ErrorType.NotFound);
 
+        public static Error AlreadyExists
+            = new Error("Email AlreadyExists","This email is already registered",ErrorType.Conflict);
+
         public static Error InvalidData
            = new Error("User.InvalidData", "Invalid user data", ErrorType.BadRequest);
 

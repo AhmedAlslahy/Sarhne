@@ -22,16 +22,15 @@ namespace Sarhne.BLL.Services.Implementation
             this._createValidator = _createValidator;
         }
 
-        public async Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation = default)
+        public async Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation)
         {
             var validationResult = await _createValidator.ValidateAsync(dto);
-
             var error = ValidationHelper.Validate(validationResult);
-
             if (error != null)
             {
                 return Response.Fail(error);
             }
+
             //create Message
             var messageData = new Message { 
             Content = dto.Content,
@@ -64,6 +63,43 @@ namespace Sarhne.BLL.Services.Implementation
             await _unitOfWork.Notifications.CreateAsync(dataNotification);
             await _unitOfWork.SaveChangesAsync(cancellation);
             return Response.Success();
+        }
+
+        public async Task<Response> StarredMessageById(int id, CancellationToken cancellation)
+        {
+           var result= await _unitOfWork.Messages.GetByIdAsync(id);
+            if(result == null)
+            {
+                return Response.Fail(MessageErrors.NotFound);
+            }
+            result.IsStarred = !result.IsStarred;
+            await _unitOfWork.SaveChangesAsync(cancellation);
+            return Response.Success();
+        }
+
+        public async Task<Response<MessageDetailsDto>> GetMessageById(int id, CancellationToken cancellation)
+        {
+            var result = await _unitOfWork.Messages.GetByIdAsync(id);
+            if (result==null)
+            {
+                return Response<MessageDetailsDto>.Fail(MessageErrors.NotFound);
+            }
+            var data = new MessageDetailsDto
+            {
+                Id = result.Id,
+                IsRead = result.IsRead,
+                Content = result.Content,
+                CreatedAt = result.CreatedAt,
+                IsStarred = result.IsStarred,
+                PhotoUrl = result.PhotoUrl,
+            };
+            if (!result.IsRead)
+            {
+                result.IsRead = true;
+                await _unitOfWork.SaveChangesAsync(cancellation);
+            }
+
+            return Response<MessageDetailsDto>.Success(data);
         }
 
         public async Task<Response<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation)

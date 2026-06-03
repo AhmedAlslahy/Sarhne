@@ -106,19 +106,16 @@ namespace Sarhne.BLL.Services.Implementation
             return Response<UserDetailsDto>.Success(data);
         }
 
-        public async Task<Response> UpdateAsync(UserUpdateDto dto)
+        public async Task<Response> UpdateAsync(UserUpdateDto dto, string userId)
         {
             var validationResult = await _updateValidator.ValidateAsync(dto);
-
             var error = ValidationHelper.Validate(validationResult);
-
             if (error != null)
             {
                 return Response.Fail(error);
             }
 
-            var user = await _userManager.FindByIdAsync(dto.Id);
-
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return Response.Fail(UserErrors.NotFound);
@@ -131,8 +128,7 @@ namespace Sarhne.BLL.Services.Implementation
             user.PublicLink = dto.PublicLink+ uniqueNumber;
             user.ImageUrl = dto.Image != null ? Upload.UploadFile("Photos", dto.Image) : null;
 
-            var result = await _userManager.UpdateAsync(user);
-
+            await _userManager.UpdateAsync(user);
             return Response.Success();
         }
     }

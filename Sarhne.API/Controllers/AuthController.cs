@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sarhne.BLL.DTOs.Auth;
 using Sarhne.BLL.DTOs.Email;
 using Sarhne.BLL.Services.Interfaces;
+using System.Security.Claims;
 
 namespace Sarhne.API.Controllers
 {
@@ -62,9 +63,9 @@ namespace Sarhne.API.Controllers
 
         //----------------------------------------------------
         [HttpPost("send-confirm-email-OTP")]
-        public async Task<IActionResult> SendConfirmEmailOTP([FromBody]string userId, CancellationToken cancellation)
-        {
-            var result = await _emailService.SendConfirmEmailOTP(userId, cancellation);
+        public async Task<IActionResult> SendConfirmEmailOTP(string email, CancellationToken cancellation)
+        {            
+            var result = await _emailService.SendConfirmEmailOTP(email, cancellation);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Failure);
@@ -73,9 +74,9 @@ namespace Sarhne.API.Controllers
         }
 
         [HttpPost("Send-Forget-Password-OTP")]
-        public async Task<IActionResult> SendForgetPasswordOTP([FromBody] string userId, CancellationToken cancellation)
+        public async Task<IActionResult> SendForgetPasswordOTP(string email,CancellationToken cancellation)
         {
-            var result = await _emailService.SendForgetPasswordOTP(userId, cancellation);
+            var result = await _emailService.SendForgetPasswordOTP(email, cancellation);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Failure);
@@ -86,7 +87,12 @@ namespace Sarhne.API.Controllers
         [HttpPost("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
         {
-            var result = await _emailService.ConfirmEmail(dto);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated");
+            }
+            var result = await _emailService.ConfirmEmail(dto, userId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Failure);
@@ -96,9 +102,9 @@ namespace Sarhne.API.Controllers
 
 
         [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto)
+        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto,string email)
         {
-            var result = await _emailService.ForgetPassword(dto);
+            var result = await _emailService.ForgetPassword(dto, email);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Failure);
@@ -110,7 +116,12 @@ namespace Sarhne.API.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
-            var result = await _emailService.ResetPassword(dto);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated");
+            }
+            var result = await _emailService.ResetPassword(dto, userId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Failure);

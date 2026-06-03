@@ -7,13 +7,8 @@ namespace Sarhne.BLL.Validation.User
     {
         public UserUpdateDtoValidator()
         {
-            RuleFor(x => x.Id)
-                .NotEmpty()
-                .WithMessage("User Id is required.");
 
             RuleFor(x => x.FullName)
-                .NotEmpty()
-                .WithMessage("Full name is required.")
                 .MaximumLength(100)
                 .WithMessage("Full name cannot exceed 100 characters.");
 
@@ -28,8 +23,6 @@ namespace Sarhne.BLL.Validation.User
                 .WithMessage("Profile description cannot exceed 500 characters.");
 
             RuleFor(x => x.PublicLink)
-                .NotEmpty()
-                .WithMessage("Public link is required.")
                 .MaximumLength(50)
                 .WithMessage("Public link cannot exceed 50 characters.")
                 .Matches(@"^[a-zA-Z0-9_-]+$")

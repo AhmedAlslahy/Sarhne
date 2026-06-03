@@ -20,7 +20,7 @@ namespace Sarhne.DAL.Configration
                 .HasDefaultValue(true);
 
             builder.Property(x => x.ShowProfileViews)
-                .HasDefaultValue(false);
+                .HasDefaultValue(true);
         }
     }
 }

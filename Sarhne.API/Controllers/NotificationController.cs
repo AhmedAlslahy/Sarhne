@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sarhne.BLL.Services.Interfaces;
+using System.Security.Claims;
 
 namespace Sarhne.API.Controllers
 {
@@ -16,8 +17,13 @@ namespace Sarhne.API.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetAllByUserId(string userId, CancellationToken cancellation)
+        public async Task<IActionResult> GetAllByUserId(CancellationToken cancellation)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated");
+            }
             var result = await _notificationService.GetAllByUserId(userId,cancellation);
             if (!result.IsSuccess)
             {
@@ -27,8 +33,13 @@ namespace Sarhne.API.Controllers
         }
 
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById(int Id,string userId, CancellationToken cancellation)
+        public async Task<IActionResult> GetById(int Id, CancellationToken cancellation)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated");
+            }
             var result = await _notificationService.GetById(Id,userId,cancellation);
             if (!result.IsSuccess)
             {
@@ -37,9 +48,14 @@ namespace Sarhne.API.Controllers
             return Ok(result.Data);
         }
 
-        [HttpGet("unread-count/{userId}")]
-        public async Task<IActionResult> GetById(string userId, CancellationToken cancellation)
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetById(CancellationToken cancellation)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User not authenticated");
+            }
             var result = await _notificationService.UnreadCountByUserId(userId, cancellation);
             if (!result.IsSuccess)
             {

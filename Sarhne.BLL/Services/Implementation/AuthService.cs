@@ -7,6 +7,7 @@ using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Enums;
+using Sarhne.DAL.Repository.Interfaces;
 using static Sarhne.BLL.Abstraction.Errors;
 using static Sarhne.BLL.Helper.HelperMethod;
 
@@ -18,7 +19,6 @@ namespace Sarhne.BLL.Services.Implementation
         private readonly IJwtService _jwtService;
         private readonly IValidator<LoginDto> _Loginvalidator;
         private readonly IValidator<RegisterDto> _Regvalidator;
-
         public AuthService(UserManager<User> userManager, IJwtService _jwtService
             , IValidator<LoginDto> _Loginvalidator, IValidator<RegisterDto> _Regvalidator)
         {
@@ -31,9 +31,7 @@ namespace Sarhne.BLL.Services.Implementation
         public async Task<Response> Register(RegisterDto dto, CancellationToken cancellation)
         {
             var validationResult = await _Regvalidator.ValidateAsync(dto);
-
             var error = ValidationHelper.Validate(validationResult);
-
             if (error != null)
             {
                 return Response.Fail(error);
@@ -42,7 +40,7 @@ namespace Sarhne.BLL.Services.Implementation
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
             {
-                return Response.Fail(AuthErrors.NotFound);
+                return Response.Fail(UserErrors.AlreadyExists);
             }
 
             var user = new User
@@ -50,11 +48,16 @@ namespace Sarhne.BLL.Services.Implementation
                 Email = dto.Email,
                 FullName = dto.FullName,
                 UserName = dto.UserName,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                UserSetting = new UserSetting
+                {
+                    AllowAnonymousMessages = true,
+                    ShowLastSeen = true,
+                    ShowProfileViews = true
+                }
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -93,7 +96,6 @@ namespace Sarhne.BLL.Services.Implementation
                 return Response<LoginRes>.Fail(tokenResult.Failure);
             }
 
-            //for api return token 
             var data = new LoginRes { 
             Token= tokenResult.Data.Token,
             ExpireIn = tokenResult.Data.ExpireIn

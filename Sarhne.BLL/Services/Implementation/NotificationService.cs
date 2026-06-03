@@ -23,9 +23,7 @@ namespace Sarhne.BLL.Services.Implementation
         public async Task<Response> Create(CreateNotificationDto dto, CancellationToken cancellation = default)
         {
             var validationResult = await _createValidator.ValidateAsync(dto);
-
             var error = ValidationHelper.Validate(validationResult);
-
             if (error != null)
             {
                 return Response.Fail(error);

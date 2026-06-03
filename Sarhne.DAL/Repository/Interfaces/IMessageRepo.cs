@@ -9,5 +9,6 @@ namespace Sarhne.DAL.Repository.Interfaces
         IQueryable<Message> GetAllByUserId(string userId);
         IQueryable<Message> GetAllStarredByUserId(string userId);
         IQueryable<Message> GetAllUnreadByUserId(string userId);
+        Task<Message?> GetByIdAsync(int id);
     }
 }

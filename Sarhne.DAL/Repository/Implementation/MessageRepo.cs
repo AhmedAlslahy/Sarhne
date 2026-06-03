@@ -16,7 +16,6 @@ namespace Sarhne.DAL.Repository.Implementation
         public async Task CreateAsync(Message message)
         {
             await _context.Messages.AddAsync(message);
-            await _context.SaveChangesAsync();
         }
 
         public IQueryable<Message> GetAllByUserId(string userId)
@@ -32,6 +31,10 @@ namespace Sarhne.DAL.Repository.Implementation
         public IQueryable<Message> GetAllStarredByUserId(string userId)
         {
             return _context.Messages.Where(n => n.ReceiverId == userId && n.IsStarred).AsNoTracking();
+        }
+        public async Task<Message?> GetByIdAsync(int id)
+        {
+            return await _context.Messages.FindAsync(id);
         }
     }
 }

@@ -7,10 +7,6 @@ namespace Sarhne.BLL.Validation.Email
     {
         public ForgetPasswordDtoValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .WithMessage("UserId is required.");
-
             RuleFor(x => x.OTP)
                 .NotEmpty()
                 .WithMessage("OTP is required.")
