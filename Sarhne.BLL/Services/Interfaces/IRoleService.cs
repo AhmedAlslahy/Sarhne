@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Sarhne.BLL.Abstraction;
 
-namespace Sarhne.BLL.Services.Interfaces
+namespace Sarhne.BLL.Services.Interfaces;
+
+public interface IRoleService
 {
-    public interface IRoleService
-    {
-        Task<Response<IEnumerable<IdentityRole>>> GetAllRolesAsync();
-        Task<Response> CreateRoleAsync(string roleName);
-        Task<Response> DeleteRoleAsync(string roleId);
-    }
+    Task<Result<IEnumerable<IdentityRole>>> GetAllRolesAsync();
+
+    Task<Result> CreateRoleAsync(string roleName);
+
+    Task<Result> DeleteRoleAsync(string roleId);
 }

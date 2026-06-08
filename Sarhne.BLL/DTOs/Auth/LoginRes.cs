@@ -1,9 +1,8 @@
-﻿
-namespace Sarhne.BLL.DTOs.Auth
+﻿namespace Sarhne.BLL.DTOs.Auth
 {
     public class LoginRes
     {
-        public string Token { get; set; }
+        public required string Token { get; set; }
         public DateTime ExpireIn { get; set; }
     }
 }

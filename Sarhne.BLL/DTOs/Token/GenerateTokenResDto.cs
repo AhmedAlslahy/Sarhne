@@ -1,9 +1,8 @@
-﻿
-namespace Sarhne.BLL.DTOs.Token
+﻿namespace Sarhne.BLL.DTOs.Token
 {
     public class GenerateTokenResDto
     {
-        public string Token { get; set; }
+        public required string Token { get; set; }
         public DateTime ExpireIn { get; set; }
     }
 }

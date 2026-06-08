@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Sarhne.DAL.Entities;
 
 namespace Sarhne.API.Data.Seed
@@ -25,6 +24,7 @@ namespace Sarhne.API.Data.Seed
             {
                 admin = new User
                 {
+                    FullName = "admin",
                     UserName = adminEmail,
                     Email = adminEmail,
                     EmailConfirmed = true,

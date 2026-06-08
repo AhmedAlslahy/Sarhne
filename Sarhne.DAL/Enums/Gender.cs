@@ -1,11 +1,7 @@
-﻿
+﻿namespace Sarhne.DAL.Enums;
 
-
-namespace Sarhne.DAL.Enums
+public enum Gender
 {
-    public enum Gender
-    {
-        Male,
-        Female
-    }
+    Male,
+    Female
 }

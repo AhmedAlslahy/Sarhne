@@ -3,7 +3,7 @@ using Sarhne.BLL.DTOs.Notification;
 
 namespace Sarhne.BLL.Validation.Notification
 {
-    public class CreateNotificationDtoValidator : AbstractValidator<CreateNotificationDto>
+    public class CreateNotificationDtoValidator : AbstractValidator<SendNotificationDto>
     {
         public CreateNotificationDtoValidator()
         {

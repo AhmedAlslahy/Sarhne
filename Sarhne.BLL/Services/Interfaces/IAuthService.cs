@@ -1,11 +1,11 @@
 ﻿using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Auth;
 
-namespace Sarhne.BLL.Services.Interfaces
+namespace Sarhne.BLL.Services.Interfaces;
+
+public interface IAuthService
 {
-    public interface IAuthService
-    {
-        Task<Response> Register(RegisterDto dto, CancellationToken cancellation = default);
-        Task<Response<LoginRes>> Login(LoginDto dto);
-    }
+    Task<Result> Register(RegisterDto dto, CancellationToken cancellation = default);
+
+    Task<Result<LoginRes>> Login(LoginDto dto);
 }

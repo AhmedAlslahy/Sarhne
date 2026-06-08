@@ -7,7 +7,6 @@ namespace Sarhne.BLL.Validation.User
     {
         public UserUpdateDtoValidator()
         {
-
             RuleFor(x => x.FullName)
                 .MaximumLength(100)
                 .WithMessage("Full name cannot exceed 100 characters.");

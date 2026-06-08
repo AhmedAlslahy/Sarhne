@@ -1,14 +1,14 @@
-﻿
+﻿using Sarhne.DAL.Entities;
 
-using Sarhne.DAL.Entities;
+namespace Sarhne.DAL.Repository.Interfaces;
 
-namespace Sarhne.DAL.Repository.Interfaces
+public interface INotificationRepo
 {
-    public interface INotificationRepo
-    {
-        Task CreateAsync(Notification notification);
-        Task<Notification> GetById(int id, string userId ,CancellationToken cancellation = default);
-        IQueryable<Notification> GetAllByUserId(string userId);
-        Task<int> UnreadCountByUserIdAsync(string userId, CancellationToken cancellation = default);
-    }
+    Task SendAsync(Notification notification);
+
+    Task<Notification?> GetById(int id, string userId, CancellationToken cancellation = default);
+
+    IQueryable<Notification> GetAllByUserId(string userId);
+
+    Task<int> UnreadCountByUserIdAsync(string userId, CancellationToken cancellation = default);
 }

@@ -1,15 +1,19 @@
 ﻿using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Email;
 
-namespace Sarhne.BLL.Services.Interfaces
+namespace Sarhne.BLL.Services.Interfaces;
+
+public interface IEmailService
 {
-    public interface IEmailService
-    {
-        Task<Response> EmailBody(string to, string subject, string body, CancellationToken cancellation = default);
-        Task<Response> SendConfirmEmailOTP(string email, CancellationToken cancellation = default);
-        Task<Response> SendForgetPasswordOTP(string email, CancellationToken cancellation = default);
-        Task<Response> ConfirmEmail(ConfirmEmailDto dto, string userId);
-        Task<Response> ForgetPassword(ForgetPasswordDto dto, string email);
-        Task<Response> ResetPassword(ResetPasswordDto dto, string userId);
-    }
+    Task<Result> EmailBody(string to, string subject, string body, CancellationToken cancellation = default);
+
+    Task<Result> SendConfirmEmailOTP(string email, CancellationToken cancellation = default);
+
+    Task<Result> SendForgetPasswordOTP(string email, CancellationToken cancellation = default);
+
+    Task<Result> ConfirmEmail(ConfirmEmailDto dto, string userId);
+
+    Task<Result> ForgetPassword(ForgetPasswordDto dto, string email);
+
+    Task<Result> ResetPassword(ResetPasswordDto dto, string userId);
 }

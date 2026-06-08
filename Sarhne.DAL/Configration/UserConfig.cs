@@ -2,57 +2,63 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sarhne.DAL.Entities;
 
-namespace Sarhne.DAL.Configration
+namespace Sarhne.DAL.Configration;
+
+public class UserConfig : IEntityTypeConfiguration<User>
 {
-    public class UserConfig : IEntityTypeConfiguration<User>
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            builder.ToTable("Users");
+        builder.ToTable("Users");
 
-            builder.Property(u => u.FullName)
-                .HasMaxLength(200)
-                .IsRequired(false);
+        builder.Property(u => u.FullName)
+            .HasMaxLength(200)
+            .IsRequired(false);
 
-            builder.Property(u => u.Gender)
-                .IsRequired(false);
+        builder.Property(u => u.ImageUrl)
+            .HasMaxLength(500)
+            .IsRequired(false);
 
-            builder.Property(u => u.ImageUrl)
-                .HasMaxLength(500)
-                .IsRequired(false);
+        builder.Property(u => u.PublicLink)
+            .HasMaxLength(100)
+            .IsRequired(false);
 
-            builder.Property(u => u.PublicLink)
-                .HasMaxLength(100)
-                .IsRequired(false);
+        builder.Property(u => u.ProfileDescription)
+            .HasMaxLength(300)
+            .IsRequired(false);
 
-            builder.Property(u => u.ProfileDescription)
-                .HasMaxLength(300)
-                .IsRequired(false);
+        builder.Property(u => u.LastSeen)
+            .IsRequired(false);
 
-            builder.Property(u => u.LastSeen)
-                .IsRequired(false);
+        builder.Property(u => u.ProfileViewsCount)
+            .HasDefaultValue(0);
 
-            builder.Property(u => u.ProfileViewsCount)
-                .HasDefaultValue(0);
+        //Relations
+        //User Setting
+        builder.HasOne(u => u.UserSetting)
+         .WithOne(s => s.User)
+         .HasForeignKey<UserSetting>(s => s.UserId)
+         .IsRequired();
 
-            //Relations
-            //User Setting
-            builder.HasOne(u => u.UserSetting)
-           .WithOne(s => s.User)
-           .HasForeignKey<UserSetting>(s => s.UserId)
-           .IsRequired();
+        //Message
+        builder.HasMany(u => u.ReceivedMessages)
+          .WithOne(m => m.Receiver)
+          .HasForeignKey(m => m.ReceiverId)
+          .OnDelete(DeleteBehavior.Restrict);
 
-            //Message
-            builder.HasMany(u => u.ReceivedMessages)
-           .WithOne(m => m.Receiver)
-           .HasForeignKey(m => m.ReceiverId)
-           .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(u => u.SentMessages)
+          .WithOne(m => m.Sender)
+          .HasForeignKey(m => m.SenderId)
+          .OnDelete(DeleteBehavior.Restrict);
 
-            //Notification
-            builder.HasMany(u => u.Notifications)
-            .WithOne(n => n.Receiver)
-            .HasForeignKey(n => n.ReceiverId)
-            .OnDelete(DeleteBehavior.Cascade);
-        }
+        //Notification
+        builder.HasMany(u => u.Notifications)
+          .WithOne(n => n.Receiver)
+          .HasForeignKey(n => n.ReceiverId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(u => u.SentMessages)
+          .WithOne(n => n.Sender)
+          .HasForeignKey(m => m.SenderId)
+          .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,10 +1,8 @@
-﻿
-
-namespace Sarhne.BLL.DTOs.Email
+﻿namespace Sarhne.BLL.DTOs.Email
 {
     public class ForgetPasswordDto
     {
-        public string OTP { get; set; }
-        public string NewPassword { get; set; }
+        public required string OTP { get; set; }
+        public required string NewPassword { get; set; }
     }
 }

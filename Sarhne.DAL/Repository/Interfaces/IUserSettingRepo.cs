@@ -1,13 +1,8 @@
-﻿
+﻿using Sarhne.DAL.Entities;
 
-using Sarhne.DAL.Entities;
+namespace Sarhne.DAL.Repository.Interfaces;
 
-namespace Sarhne.DAL.Repository.Interfaces
+public interface IUserSettingRepo
 {
-    public interface IUserSettingRepo
-    {
-        Task<UserSetting> GetByUserIdAsync(string userId, CancellationToken cancellation = default);
-        //Task Update(UserSetting userSetting);
-        //Task CreateAsync(UserSetting userSetting);
-    }
+    Task<UserSetting?> GetByUserIdAsync(string userId, CancellationToken cancellation = default);
 }

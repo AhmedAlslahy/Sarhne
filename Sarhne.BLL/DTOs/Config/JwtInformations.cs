@@ -1,4 +1,4 @@
-﻿namespace Sarhne.BLL.DTOs.Auth
+﻿namespace Sarhne.BLL.DTOs.Config
 {
     public class JwtInformations
     {

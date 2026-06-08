@@ -4,24 +4,18 @@ using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Repository.Interfaces;
 
-
 namespace Sarhne.BLL.Services.Implementation
 {
-    public class UserSettingService : IUserSettingService
+    public class UserSettingService(IUnitOfWork unitOfWork) : IUserSettingService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork unitOfWork = unitOfWork;
 
-        public UserSettingService(IUnitOfWork _unitOfWork)
+        public async Task<Result<UserSettingDto>> GetByUserId(string userId, CancellationToken cancellation = default)
         {
-            this._unitOfWork = _unitOfWork;
-        }
-
-       public async Task<Response<UserSettingDto>> GetByUserId(string userId, CancellationToken cancellation = default)
-        {
-            var result = await _unitOfWork.UserSettings.GetByUserIdAsync(userId, cancellation);
+            var result = await unitOfWork.UserSettings.GetByUserIdAsync(userId, cancellation);
             if (result == null)
             {
-                return Response<UserSettingDto>.Fail(UserErrors.NotFound);
+                return Result<UserSettingDto>.Fail(UserErrors.NotFound);
             }
             var data = new UserSettingDto
             {
@@ -30,27 +24,27 @@ namespace Sarhne.BLL.Services.Implementation
                 ShowProfileViews = result.ShowProfileViews,
             };
 
-            return Response<UserSettingDto>.Success(data);
+            return Result<UserSettingDto>.Success(data);
         }
 
-       public async Task<Response> Update(UpdateUserSettingDto dto, string userId, CancellationToken cancellation = default)
+        public async Task<Result> Update(UpdateUserSettingDto dto, string userId, CancellationToken cancellation = default)
         {
             if (dto == null)
             {
-                return Response.Fail(UserErrors.InvalidSettingData);
+                return UserErrors.InvalidSettingData;
             }
-            var result = await _unitOfWork.UserSettings.GetByUserIdAsync(userId);
+            var result = await unitOfWork.UserSettings.GetByUserIdAsync(userId);
             if (result == null)
             {
-                return Response.Fail(UserErrors.NotFound);
+                return UserErrors.NotFound;
             }
 
             result.AllowAnonymousMessages = dto.AllowAnonymousMessages;
             result.ShowLastSeen = dto.ShowLastSeen;
             result.ShowProfileViews = dto.ShowProfileViews;
 
-            await _unitOfWork.SaveChangesAsync(cancellation);
-            return Response.Success();
-        } 
+            await unitOfWork.SaveChangesAsync(cancellation);
+            return Result.Success();
+        }
     }
 }

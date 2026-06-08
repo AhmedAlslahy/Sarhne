@@ -1,41 +1,21 @@
-﻿
-using Sarhne.DAL.Enums;
-using static Sarhne.BLL.Abstraction.Errors;
+﻿using Sarhne.DAL.Enums;
+using Sarhne.BLL.Abstraction;
 
-namespace Sarhne.BLL.Helper
+namespace Sarhne.BLL.Helper;
+
+public static class HelperMethod
 {
-   public static class HelperMethod
+    public static class ValidationHelper
     {
-        public static string GetPreview(string message, int maxLength = 50)
+        public static Error? Validate(FluentValidation.Results.ValidationResult result)
         {
-            if (string.IsNullOrEmpty(message))
-                return message;
+            if (result.IsValid)
+                return null;
 
-            if (message.Length <= maxLength)
-                return message;
-
-            var trimmed = message.Substring(0, maxLength);
-            var lastSpace = trimmed.LastIndexOf(' ');
-
-            if (lastSpace > 0)
-                trimmed = trimmed.Substring(0, lastSpace);
-
-            return trimmed + "...";
-        }
-
-
-        public static class ValidationHelper
-        {
-            public static Error? Validate(FluentValidation.Results.ValidationResult result)
-            {
-                if (result.IsValid)
-                    return null;
-
-                return new Error(
-                    "ValidationError",
-                    string.Join(", ", result.Errors.Select(x => x.ErrorMessage)),
-                    ErrorType.BadRequest);
-            }
+            return new Error(
+                "ValidationError",
+                string.Join(", ", result.Errors.Select(x => x.ErrorMessage)),
+                ErrorType.BadRequest);
         }
     }
 }

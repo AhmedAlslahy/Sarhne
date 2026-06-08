@@ -1,41 +1,57 @@
-﻿
-using static Sarhne.BLL.Abstraction.Errors;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Sarhne.BLL.Abstraction
+namespace Sarhne.BLL.Abstraction;
+
+public class Result<T> : Result
 {
-    public class Response<T>
+    [MemberNotNullWhen(true, nameof(Data))]
+    [MemberNotNullWhen(false, nameof(Failure))]
+    public override bool IsSuccess => base.IsSuccess;
+
+    [MemberNotNullWhen(true, nameof(Failure))]
+    [MemberNotNullWhen(false, nameof(Data))]
+    public bool IsFailed => !IsSuccess;
+
+    public T? Data { get; private set; }
+    public override Error? Failure => base.Failure;
+
+    public Result(T data)
+        : base()
     {
-        public bool IsSuccess { get; private set; }
-        public T? Data { get; private set; }
-        public Error? Failure { get; private set; }
-
-        private Response() { }
-
-        private Response(bool isSuccess, T? data, Error? error)
-        {
-            IsSuccess = isSuccess;
-            Data = data;
-            Failure = error;
-        }
-
-        public static Response<T> Success(T data)
-            => new(true, data, null);
-
-        public static Response<T> Fail(Error error)
-            => new(false, default, error);
+        Data = data;
     }
 
+    public Result(Error error)
+        : base(error) { }
 
-    public class Response
+    public static Result<TData> Success<TData>(TData data) => new(data);
+
+    public static new Result<T> Fail(Error error) => new(error);
+
+    public static implicit operator Result<T>(T data) => Success(data);
+
+    public static implicit operator Result<T>(Error error) => Fail(error);
+}
+
+public class Result
+{
+    public Result(Error error)
     {
-        public bool IsSuccess { get; set; }
-
-        public Error? Failure { get; set; }
-
-        public static Response Success()
-            => new() { IsSuccess = true };
-
-        public static Response Fail(Error error)
-            => new() { IsSuccess = false, Failure = error };
+        IsSuccess = false;
+        Failure = error;
     }
+
+    public Result()
+    {
+        IsSuccess = true;
+    }
+
+    public virtual bool IsSuccess { get; private set; }
+    public virtual Error? Failure { get; private set; }
+
+    public static Result Success() => new();
+
+    public static Result Fail(Error error) => new(error);
+
+    public static implicit operator Result(Error error) => Fail(error);
 }

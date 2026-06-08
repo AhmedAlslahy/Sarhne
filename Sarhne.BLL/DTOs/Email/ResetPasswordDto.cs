@@ -1,9 +1,8 @@
-﻿
-namespace Sarhne.BLL.DTOs.Email
+﻿namespace Sarhne.BLL.DTOs.Email
 {
     public class ResetPasswordDto
     {
-        public string CurrentPassword { get; set; }
-        public string NewPassword { get; set; }
+        public required string CurrentPassword { get; set; }
+        public required string NewPassword { get; set; }
     }
 }

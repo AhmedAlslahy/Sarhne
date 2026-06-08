@@ -1,6 +1,4 @@
-﻿
-
-namespace Sarhne.BLL.DTOs.Message
+﻿namespace Sarhne.BLL.DTOs.Message
 {
     public class MessageDetailsDto
     {

@@ -1,15 +1,13 @@
 ﻿using Sarhne.DAL.Enums;
-using static Sarhne.BLL.Abstraction.Errors;
+using Sarhne.BLL.Abstraction;
 
+namespace Sarhne.BLL.Errors;
 
-namespace Sarhne.BLL.Errors
+public class MessageErrors
 {
-    public class MessageErrors
-    {
-        public static Error NotFound
-          = new Error("Message.NotFound", "Message not found", ErrorType.NotFound);
+    public static Error NotFound
+      = new Error("Message.NotFound", "Message not found", ErrorType.NotFound);
 
-        public static Error InvalidData
-           = new Error("Message.InvalidData", "Invalid Message data", ErrorType.BadRequest);
-    }
+    public static Error InvalidData
+       = new Error("Message.InvalidData", "Invalid Message data", ErrorType.BadRequest);
 }

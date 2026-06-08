@@ -1,64 +1,56 @@
 ﻿using Microsoft.AspNetCore.Http;
 
+namespace Sarhne.BLL.Helper;
 
-namespace Sarhne.BLL.Helper
+public static class Upload
 {
-    public static class Upload
+    public static string UploadFile(string FolderName, IFormFile File)
     {
-        public static string UploadFile(string FolderName, IFormFile File)
+        try
         {
+            //catch the folder Path and the file name in server
+            // 1 ) Get Directory
+            string FolderPath = Directory.GetCurrentDirectory() + "/wwwroot/" + FolderName;
 
-            try
+            //2) Get File Name
+            string FileName = Guid.NewGuid() + Path.GetFileName(File.FileName);
+            //Guid => Word contain from 36 character
+
+            // 3) Merge Path with File Name
+            string FinalPath = Path.Combine(FolderPath, FileName);
+            //combine put /
+
+            //4) Save File As Streams "Data Overtime"
+            using (var Stream = new FileStream(FinalPath, FileMode.Create))
             {
-                //catch the folder Path and the file name in server
-                // 1 ) Get Directory
-                string FolderPath = Directory.GetCurrentDirectory() + "/wwwroot/" + FolderName;
-
-
-                //2) Get File Name
-                string FileName = Guid.NewGuid() + Path.GetFileName(File.FileName);
-                //Guid => Word contain from 36 character
-
-                // 3) Merge Path with File Name
-                string FinalPath = Path.Combine(FolderPath, FileName);
-                //combine put /
-
-                //4) Save File As Streams "Data Overtime"
-                using (var Stream = new FileStream(FinalPath, FileMode.Create))
-                {
-                    File.CopyTo(Stream);
-                }
-
-                return FileName;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message;
+                File.CopyTo(Stream);
             }
 
+            return FileName;
         }
-
-
-        public static string RemoveFile(string FolderName, string fileName)
+        catch (Exception ex)
         {
+            return ex.Message;
+        }
+    }
 
-            try
+    public static string RemoveFile(string FolderName, string fileName)
+    {
+        try
+        {
+            var directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Photos", FolderName, fileName);
+
+            if (File.Exists(directory))
             {
-                var directory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Photos", FolderName, fileName);
-
-                if (File.Exists(directory))
-                {
-                    File.Delete(directory);
-                    return "File Deleted";
-                }
-
-                return "File Not Deleted";
-
+                File.Delete(directory);
+                return "File Deleted";
             }
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
+
+            return "File Not Deleted";
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
         }
     }
 }

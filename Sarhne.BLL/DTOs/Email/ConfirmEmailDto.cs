@@ -1,8 +1,7 @@
-﻿
-namespace Sarhne.BLL.DTOs.Email
+﻿namespace Sarhne.BLL.DTOs.Email
 {
     public class ConfirmEmailDto
     {
-        public string OTP { get; set; }
+        public required string OTP { get; set; }
     }
 }

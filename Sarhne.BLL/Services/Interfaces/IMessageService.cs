@@ -1,17 +1,23 @@
-﻿
-
-using Sarhne.BLL.Abstraction;
+﻿using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Message;
 
-namespace Sarhne.BLL.Services.Interfaces
+namespace Sarhne.BLL.Services.Interfaces;
+
+public interface IMessageService
 {
-    public interface IMessageService
-    {
-        Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation = default);
-        Task<Response> StarredMessageById(int id, CancellationToken cancellation = default);
-        Task<Response<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation = default);
-        Task<Response<MessageDetailsDto>> GetMessageById(int id, CancellationToken cancellation = default);
-        Task<Response<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation = default);
-        Task<Response<IEnumerable<MessageDetailsDto>>> GetAllUnreadByUserId(string userId, CancellationToken cancellation = default);
-    }
+    Task<Result> CreateAsync(CreateMessageDto dto, string userId, CancellationToken cancellation = default);
+
+    Task<Result> StarredMessageById(int id, string userId, CancellationToken cancellation = default);
+
+    Task<Result<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation = default);
+
+    Task<Result<MessageDetailsDto>> GetMessageById(int id, string userId, CancellationToken cancellation = default);
+
+    Task<Result<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation = default);
+
+    Task<Result<IEnumerable<MessageDetailsDto>>> GetAllUnreadByUserId(string userId, CancellationToken cancellation = default);
+
+    Task<Result<IEnumerable<MessageDetailsDto>>> GetAllSenderByUserId(string userId, CancellationToken cancellation);
+
+    Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default);
 }

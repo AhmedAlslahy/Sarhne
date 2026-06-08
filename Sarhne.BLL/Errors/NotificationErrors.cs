@@ -1,14 +1,13 @@
 ﻿using Sarhne.DAL.Enums;
-using static Sarhne.BLL.Abstraction.Errors;
+using Sarhne.BLL.Abstraction;
 
-namespace Sarhne.BLL.Errors
+namespace Sarhne.BLL.Errors;
+
+public class NotificationErrors
 {
-    public class NotificationErrors
-    {
-        public static Error NotFound
-           = new Error("Notification.NotFound", "Notification not found", ErrorType.NotFound);
+    public static Error NotFound
+       = new Error("Notification.NotFound", "Notification not found", ErrorType.NotFound);
 
-        public static Error InvalidData
-           = new Error("Notification.InvalidData", "Invalid Notification data", ErrorType.BadRequest);
-    }
+    public static Error InvalidData
+       = new Error("Notification.InvalidData", "Invalid Notification data", ErrorType.BadRequest);
 }

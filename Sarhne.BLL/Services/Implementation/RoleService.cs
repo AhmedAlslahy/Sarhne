@@ -4,62 +4,52 @@ using Microsoft.EntityFrameworkCore;
 using Sarhne.BLL.Errors;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Enums;
-using static Sarhne.BLL.Abstraction.Errors;
 
-namespace Sarhne.BLL.Services.Implementation
+namespace Sarhne.BLL.Services.Implementation;
+
+public class RoleService(RoleManager<IdentityRole> roleManager) : IRoleService
 {
-    public class RoleService : IRoleService
+    public async Task<Result<IEnumerable<IdentityRole>>> GetAllRolesAsync()
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
-
-        public RoleService(RoleManager<IdentityRole> roleManager)
+        var roles = await roleManager.Roles.ToListAsync();
+        if (!roles.Any())
         {
-            _roleManager = roleManager;
+            return RoleErrors.NotFound;
+        }
+        return roles;
+    }
+
+    public async Task<Result> CreateRoleAsync(string roleName)
+    {
+        if (string.IsNullOrWhiteSpace(roleName))
+        {
+            return RoleErrors.InvalidData;
         }
 
-        public async Task<Response<IEnumerable<IdentityRole>>> GetAllRolesAsync()
+        if (await roleManager.RoleExistsAsync(roleName))
         {
-            var roles = await _roleManager.Roles.ToListAsync();
-            if (!roles.Any())
-            {
-                return Response<IEnumerable<IdentityRole>>
-                    .Fail(RoleErrors.NotFound);
-            }
-            return Response<IEnumerable<IdentityRole>>.Success(roles);
+            return RoleErrors.AlreadyExists;
         }
 
-        public async Task<Response> CreateRoleAsync(string roleName)
+        var result = await roleManager.CreateAsync(new IdentityRole(roleName));
+        if (!result.Succeeded)
         {
-            if (string.IsNullOrWhiteSpace(roleName))
-            {
-                return Response.Fail(RoleErrors.InvalidData);
-            }
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return new Error("Create Failed", errors, ErrorType.BadRequest);
+        }
+        return Result.Success();
+    }
 
-            if (await _roleManager.RoleExistsAsync(roleName))
-            {
-                return Response.Fail(RoleErrors.AlreadyExists);
-            }
+    public async Task<Result> DeleteRoleAsync(string roleId)
+    {
+        var role = await roleManager.FindByIdAsync(roleId);
 
-           var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return Response.Fail(new Error("Create Failed", errors, ErrorType.BadRequest));
-            }
-            return Response.Success();
+        if (role == null)
+        {
+            return RoleErrors.NotFound;
         }
 
-        public async Task<Response> DeleteRoleAsync(string roleId)
-        {
-            var role = await _roleManager.FindByIdAsync(roleId);
-
-            if (role == null)
-            {
-                return Response.Fail(RoleErrors.NotFound);
-            }
-
-            var result = await _roleManager.DeleteAsync(role);
-            return Response.Success();
-        }
+        var result = await roleManager.DeleteAsync(role);
+        return Result.Success();
     }
 }

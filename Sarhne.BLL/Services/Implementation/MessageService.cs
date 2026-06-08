@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Sarhne.BLL.Abstraction;
 using Sarhne.BLL.DTOs.Message;
 using Sarhne.BLL.Errors;
@@ -7,171 +6,181 @@ using Sarhne.BLL.Helper;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Repository.Interfaces;
-using static Sarhne.BLL.Helper.HelperMethod;
 
+namespace Sarhne.BLL.Services.Implementation;
 
-namespace Sarhne.BLL.Services.Implementation
+public class MessageService(IUnitOfWork unitOfWork) : IMessageService
 {
-    public class MessageService : IMessageService
+    public async Task<Result> CreateAsync(CreateMessageDto dto, string userId, CancellationToken cancellation)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IValidator<CreateMessageDto> _createValidator;
-        public MessageService(IUnitOfWork _unitOfWork, IValidator<CreateMessageDto> _createValidator)
+        //create Message
+        var messageData = new Message
         {
-            this._unitOfWork = _unitOfWork;
-            this._createValidator = _createValidator;
-        }
-
-        public async Task<Response> CreateAsync(CreateMessageDto dto, CancellationToken cancellation)
-        {
-            var validationResult = await _createValidator.ValidateAsync(dto);
-            var error = ValidationHelper.Validate(validationResult);
-            if (error != null)
-            {
-                return Response.Fail(error);
-            }
-
-            //create Message
-            var messageData = new Message { 
             Content = dto.Content,
-            CreatedAt = DateTime.UtcNow,
-            IsRead = false,
-            IsStarred = false,
             ReceiverId = dto.ReceiverId,
+            SenderId = userId,
             PhotoUrl = dto.Photo != null ? Upload.UploadFile("Photos", dto.Photo) : null
-            };
+        };
 
-            //create notification
-            var dataNotification = new Notification
-            {
-                Title = "New Message",
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false,
-                ReceiverId = dto.ReceiverId
-            };
-
-            if (!string.IsNullOrWhiteSpace(dto.Content))
-            {
-                dataNotification.Body = HelperMethod.GetPreview(dto.Content);
-            }
-            else if (dto.Photo != null)
-            {
-                dataNotification.Body = "Sent an image";
-            }
-            
-            await _unitOfWork.Messages.CreateAsync(messageData);
-            await _unitOfWork.Notifications.CreateAsync(dataNotification);
-            await _unitOfWork.SaveChangesAsync(cancellation);
-            return Response.Success();
-        }
-
-        public async Task<Response> StarredMessageById(int id, CancellationToken cancellation)
+        //create notification
+        var dataNotification = new Notification
         {
-           var result= await _unitOfWork.Messages.GetByIdAsync(id);
-            if(result == null)
-            {
-                return Response.Fail(MessageErrors.NotFound);
-            }
-            result.IsStarred = !result.IsStarred;
-            await _unitOfWork.SaveChangesAsync(cancellation);
-            return Response.Success();
-        }
+            Title = "New Message",
+            IsRead = false,
+            SenderId = userId,
+            ReceiverId = dto.ReceiverId
+        };
 
-        public async Task<Response<MessageDetailsDto>> GetMessageById(int id, CancellationToken cancellation)
+        if (!string.IsNullOrWhiteSpace(dto.Content))
         {
-            var result = await _unitOfWork.Messages.GetByIdAsync(id);
-            if (result==null)
-            {
-                return Response<MessageDetailsDto>.Fail(MessageErrors.NotFound);
-            }
-            var data = new MessageDetailsDto
-            {
-                Id = result.Id,
-                IsRead = result.IsRead,
-                Content = result.Content,
-                CreatedAt = result.CreatedAt,
-                IsStarred = result.IsStarred,
-                PhotoUrl = result.PhotoUrl,
-            };
-            if (!result.IsRead)
-            {
-                result.IsRead = true;
-                await _unitOfWork.SaveChangesAsync(cancellation);
-            }
-
-            return Response<MessageDetailsDto>.Success(data);
+            dataNotification.Body = dto.Content;
         }
-
-        public async Task<Response<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation)
+        else if (dto.Photo != null)
         {
-            var query = _unitOfWork.Messages.GetAllByUserId(userId);
-
-            var data = await query
-                .Select(item => new MessageDetailsDto
-                {
-                    Id = item.Id,
-                    IsRead = item.IsRead,
-                    Content = item.Content,
-                    CreatedAt = item.CreatedAt,
-                    IsStarred = item.IsStarred,
-                    PhotoUrl = item.PhotoUrl,
-                })
-                .ToListAsync(cancellation);
-
-            if (data.Count==0)
-            {
-                return Response<IEnumerable<MessageDetailsDto>>.Fail(MessageErrors.NotFound);
-            }
-
-            return Response<IEnumerable<MessageDetailsDto>>.Success(data);
+            dataNotification.Body = "Sent an image";
         }
 
-        public async Task<Response<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation)
+        await unitOfWork.Messages.CreateAsync(messageData);
+        await unitOfWork.Notifications.SendAsync(dataNotification);
+        await unitOfWork.SaveChangesAsync(cancellation);
+        return Result.Success();
+    }
+
+    public async Task<Result> StarredMessageById(int id, string userId, CancellationToken cancellation)
+    {
+        var result = await unitOfWork.Messages.GetByIdAsync(id, userId);
+        if (result == null)
         {
-            var query = _unitOfWork.Messages.GetAllStarredByUserId(userId);
-
-            var data = await query
-                .Select(item => new MessageDetailsDto
-                {
-                    Id = item.Id,
-                    IsRead = item.IsRead,
-                    Content = item.Content,
-                    CreatedAt = item.CreatedAt,
-                    IsStarred = item.IsStarred,
-                    PhotoUrl = item.PhotoUrl,
-                })
-                .ToListAsync(cancellation);
-
-            if (data.Count == 0)
-            {
-                return Response<IEnumerable<MessageDetailsDto>>.Fail(MessageErrors.NotFound);
-            }
-
-            return Response<IEnumerable<MessageDetailsDto>>.Success(data);
+            return MessageErrors.NotFound;
         }
+        result.IsStarred = !result.IsStarred;
+        await unitOfWork.SaveChangesAsync(cancellation);
+        return Result.Success();
+    }
 
-        public async Task<Response<IEnumerable<MessageDetailsDto>>> GetAllUnreadByUserId(string userId, CancellationToken cancellation)
+    public async Task<Result<MessageDetailsDto>> GetMessageById(int id, string userId, CancellationToken cancellation)
+    {
+        var result = await unitOfWork.Messages.GetByIdAsync(id, userId);
+        if (result == null)
         {
-            var query = _unitOfWork.Messages.GetAllUnreadByUserId(userId);
-
-            var data = await query
-                .Select(item => new MessageDetailsDto
-                {
-                    Id = item.Id,
-                    IsRead = item.IsRead,
-                    Content = item.Content,
-                    CreatedAt = item.CreatedAt,
-                    IsStarred = item.IsStarred,
-                    PhotoUrl = item.PhotoUrl,
-                })
-                .ToListAsync(cancellation);
-
-            if (data.Count == 0)
-            {
-                return Response<IEnumerable<MessageDetailsDto>>.Fail(MessageErrors.NotFound);
-            }
-
-            return Response<IEnumerable<MessageDetailsDto>>.Success(data);
+            return MessageErrors.NotFound;
         }
+        var data = new MessageDetailsDto
+        {
+            Id = result.Id,
+            IsRead = result.IsRead,
+            Content = result.Content,
+            CreatedAt = result.CreatedAt,
+            IsStarred = result.IsStarred,
+            PhotoUrl = result.PhotoUrl,
+        };
+        if (!result.IsRead)
+        {
+            result.IsRead = true;
+            await unitOfWork.SaveChangesAsync(cancellation);
+        }
+
+        return data;
+    }
+
+    public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation)
+    {
+        var query = unitOfWork.Messages.GetAllByUserId(userId);
+
+        var data = await query
+            .Select(item => new MessageDetailsDto
+            {
+                Id = item.Id,
+                IsRead = item.IsRead,
+                Content = item.Content,
+                CreatedAt = item.CreatedAt,
+                IsStarred = item.IsStarred,
+                PhotoUrl = item.PhotoUrl,
+            })
+            .ToListAsync(cancellation);
+
+        if (data.Count == 0)
+        {
+            return MessageErrors.NotFound;
+        }
+
+        return data;
+    }
+
+    public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation)
+    {
+        var query = unitOfWork.Messages.GetAllStarredByUserId(userId);
+
+        var data = await query
+            .Select(item => new MessageDetailsDto
+            {
+                Id = item.Id,
+                IsRead = item.IsRead,
+                Content = item.Content,
+                CreatedAt = item.CreatedAt,
+                IsStarred = item.IsStarred,
+                PhotoUrl = item.PhotoUrl,
+            })
+            .ToListAsync(cancellation);
+
+        if (data.Count == 0)
+        {
+            return MessageErrors.NotFound;
+        }
+
+        return data;
+    }
+
+    public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllUnreadByUserId(string userId, CancellationToken cancellation)
+    {
+        var query = unitOfWork.Messages.GetAllUnreadByUserId(userId);
+
+        var data = await query
+            .Select(item => new MessageDetailsDto
+            {
+                Id = item.Id,
+                IsRead = item.IsRead,
+                Content = item.Content,
+                CreatedAt = item.CreatedAt,
+                IsStarred = item.IsStarred,
+                PhotoUrl = item.PhotoUrl,
+            })
+            .ToListAsync(cancellation);
+
+        if (data.Count == 0)
+        {
+            return MessageErrors.NotFound;
+        }
+
+        return data;
+    }
+
+    public async Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default)
+    {
+        return await unitOfWork.Messages.UnreadCountByUserIdAsync(userId, cancellation);
+    }
+
+    public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllSenderByUserId(string userId, CancellationToken cancellation)
+    {
+        var query = unitOfWork.Messages.GetAllSenderByUserId(userId);
+
+        var data = await query
+            .Select(item => new MessageDetailsDto
+            {
+                Id = item.Id,
+                IsRead = item.IsRead,
+                Content = item.Content,
+                CreatedAt = item.CreatedAt,
+                IsStarred = item.IsStarred,
+                PhotoUrl = item.PhotoUrl,
+            })
+            .ToListAsync(cancellation);
+
+        if (data.Count == 0)
+        {
+            return MessageErrors.NotFound;
+        }
+
+        return data;
     }
 }

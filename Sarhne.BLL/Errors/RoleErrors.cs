@@ -1,17 +1,16 @@
 ﻿using Sarhne.DAL.Enums;
-using static Sarhne.BLL.Abstraction.Errors;
+using Sarhne.BLL.Abstraction;
 
-namespace Sarhne.BLL.Errors
+namespace Sarhne.BLL.Errors;
+
+public class RoleErrors
 {
-    public class RoleErrors
-    {
-        public static Error NotFound
-           = new Error("Role.NotFound", "Role not found", ErrorType.NotFound);
+    public static Error NotFound
+       = new Error("Role.NotFound", "Role not found", ErrorType.NotFound);
 
-        public static Error InvalidData
-           = new Error("Role.InvalidData", "Invalid Role data", ErrorType.BadRequest);
+    public static Error InvalidData
+       = new Error("Role.InvalidData", "Invalid Role data", ErrorType.BadRequest);
 
-        public static Error AlreadyExists
-           = new Error("Role.AlreadyExists", "Already Exists Role data", ErrorType.Conflict);
-    }
+    public static Error AlreadyExists
+       = new Error("Role.AlreadyExists", "Already Exists Role data", ErrorType.Conflict);
 }

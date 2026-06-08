@@ -1,14 +1,8 @@
-﻿
+﻿using Sarhne.DAL.Enums;
 
-using Sarhne.DAL.Enums;
+namespace Sarhne.BLL.Abstraction;
 
-namespace Sarhne.BLL.Abstraction
+public record Error(string Code, string Description, ErrorType? StatusCode)
 {
-    public class Errors
-    {
-        public record Error(string Code, string Description, ErrorType? StatusCode)
-        {
-            public static readonly Error None = new Error(string.Empty, string.Empty, ErrorType.None);
-        }
-    }
+    public static readonly Error None = new(string.Empty, string.Empty, ErrorType.None);
 }

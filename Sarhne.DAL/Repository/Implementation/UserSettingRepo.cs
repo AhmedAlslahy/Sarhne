@@ -1,32 +1,14 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Sarhne.DAL.Database;
 using Sarhne.DAL.Entities;
 using Sarhne.DAL.Repository.Interfaces;
 
-namespace Sarhne.DAL.Repository.Implementation
+namespace Sarhne.DAL.Repository.Implementation;
+
+public class UserSettingRepo(SarhneDbContext context) : IUserSettingRepo
 {
-    public class UserSettingRepo : IUserSettingRepo
+    public async Task<UserSetting?> GetByUserIdAsync(string userId, CancellationToken cancellation = default)
     {
-        SarhneDbContext _context;
-        public UserSettingRepo(SarhneDbContext context)
-        {
-            _context = context;
-        }
-
-       public async Task<UserSetting?> GetByUserIdAsync(string userId, CancellationToken cancellation = default)
-        {
-            return await _context.UserSettings.FirstOrDefaultAsync(x => x.UserId == userId, cancellation);
-        }
-
-
-        //public async Task Update(UserSetting userSetting)
-        //{
-        //    _context.UserSettings.Update(userSetting);
-        //}
-        //public async Task CreateAsync(UserSetting userSetting)
-        //{
-        //   await _context.UserSettings.AddAsync(userSetting);
-        //}
+        return await context.UserSettings.FirstOrDefaultAsync(x => x.UserId == userId, cancellation);
     }
 }

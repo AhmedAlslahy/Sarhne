@@ -1,15 +1,11 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
-
-namespace Sarhne.BLL.DTOs.Auth
+﻿namespace Sarhne.BLL.DTOs.Auth
 {
     public class RegisterDto
     {
-        public string FullName { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+        public required string FullName { get; set; }
+        public required string UserName { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+        public required string ConfirmPassword { get; set; }
     }
 }

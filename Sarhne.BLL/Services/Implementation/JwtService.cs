@@ -1,8 +1,7 @@
-﻿
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Sarhne.BLL.Abstraction;
-using Sarhne.BLL.DTOs.Auth;
+using Sarhne.BLL.DTOs.Config;
 using Sarhne.BLL.DTOs.Token;
 using Sarhne.BLL.Services.Interfaces;
 using Sarhne.DAL.Entities;
@@ -10,43 +9,42 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Sarhne.BLL.Services.Implementation
+namespace Sarhne.BLL.Services.Implementation;
+
+public class JwtService(IOptions<JwtInformations> options) : IJwtService
 {
-    public class JwtService : IJwtService
+    private readonly JwtInformations jwt = options.Value;
+
+    public async Task<Result<GenerateTokenResDto>> GenerateToken(User user, IList<string> roles)
     {
-        private readonly JwtInformations _jwt;
+        List<Claim> UserClaims =
+     [
+         new(ClaimTypes.Name, user.UserName),
+        new(ClaimTypes.NameIdentifier, user.Id),
+        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    ];
 
-        public JwtService(IOptions<JwtInformations> options)
+        foreach (var role in roles)
         {
-            _jwt = options.Value;
+            UserClaims.Add(new Claim(ClaimTypes.Role, role));
         }
-        public async Task<Response<GenerateTokenResDto>> GenerateToken(User user, IList<string> roles)
-        {
-            List<Claim> UserClaims = new List<Claim>();
-            UserClaims.Add(new Claim(ClaimTypes.Name, user.UserName));
-            UserClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-            UserClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            foreach (var role in roles)
-            {
-                UserClaims.Add(new Claim(ClaimTypes.Role, role));
-            }
-           
-            var SignInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.SecretKey));
-            var SignInCred = new SigningCredentials(SignInKey, SecurityAlgorithms.HmacSha256);
 
-            JwtSecurityToken userToken = new JwtSecurityToken(
-                audience: _jwt.AudienceIP,
-                issuer: _jwt.IssuerIP,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: SignInCred,
-                claims: UserClaims
-             );
-            var data = new GenerateTokenResDto {
-            Token =new JwtSecurityTokenHandler().WriteToken(userToken),
+        var SignInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey));
+        var SignInCred = new SigningCredentials(SignInKey, SecurityAlgorithms.HmacSha256);
+
+        JwtSecurityToken userToken = new JwtSecurityToken(
+            audience: jwt.AudienceIP,
+            issuer: jwt.IssuerIP,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: SignInCred,
+            claims: UserClaims
+         );
+        var data = new GenerateTokenResDto
+        {
+            Token = new JwtSecurityTokenHandler().WriteToken(userToken),
             ExpireIn = DateTime.UtcNow.AddHours(1),
-            };
-            
-            return Response<GenerateTokenResDto>.Success(data);
-        }
+        };
+
+        return Result<GenerateTokenResDto>.Success(data);
     }
 }
