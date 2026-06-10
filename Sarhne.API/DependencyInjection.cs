@@ -1,35 +1,41 @@
-﻿using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Sarhne.BLL.DTOs.Config;
-using Sarhne.BLL.Services.Implementation;
-using Sarhne.BLL.Services.Interfaces;
-using Sarhne.BLL.Validation.Auth;
-using Sarhne.DAL.Database;
-using Sarhne.DAL.Entities;
-using Sarhne.DAL.Repository.Implementation;
-using Sarhne.DAL.Repository.Interfaces;
-using System.Text;
-
-namespace Sarhne.API.Extensions;
+﻿namespace Sarhne.API;
 
 public static class DependencyInjection
 {
+    //configuration
+    public static WebApplicationBuilder AddProjectConfiguration(
+  this WebApplicationBuilder builder)
+    {
+        builder.Configuration
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+            .AddJsonFile(
+                $"appsettings.{builder.Environment.EnvironmentName}.json",
+                optional: true)
+            .AddEnvironmentVariables();
+
+        return builder;
+    }
+
+    //Database
+    public static IServiceCollection AddDatabase(
+     this IServiceCollection services,
+     IConfiguration configuration)
+    {
+        services.AddDbContext<SarhneDbContext>(options =>
+            options.UseSqlServer(
+                configuration.GetConnectionString("ProjectConnection")));
+
+        return services;
+    }
+
+    // Services
     public static IServiceCollection AddApplicationServices(
   this IServiceCollection services,
   IConfiguration configuration)
     {
-        // Repositories
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<INotificationRepo, NotificationRepo>();
-        services.AddScoped<IUserSettingRepo, UserSettingRepo>();
-        services.AddScoped<IMessageRepo, MessageRepo>();
-
-        // Services
         services.Configure<JwtInformations>(
-            configuration.GetSection("JWTInformations"));
+                configuration.GetSection("JWTInformations"));
         services.Configure<EmailInformations>(
             configuration.GetSection("EmailInformations"));
 
@@ -45,6 +51,24 @@ public static class DependencyInjection
         return services;
     }
 
+    //cors
+    public static IServiceCollection AddCorsPolicy(
+      this IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("MyPolicy", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
+
+        return services;
+    }
+
+    //validation
     public static IServiceCollection AddValidationServices(
         this IServiceCollection services)
     {
@@ -55,6 +79,7 @@ public static class DependencyInjection
         return services;
     }
 
+    //JWT
     public static IServiceCollection AddJwtAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -102,6 +127,7 @@ public static class DependencyInjection
         return services;
     }
 
+    //IDentity
     public static IServiceCollection AddIdentityServices(
         this IServiceCollection services)
     {

@@ -1,7 +1,4 @@
-﻿using Sarhne.DAL.Enums;
-using Sarhne.BLL.Abstraction;
-
-namespace Sarhne.BLL.Errors;
+﻿namespace Sarhne.BLL.Errors;
 
 public class MessageErrors
 {

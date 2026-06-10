@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Sarhne.DAL.Database;
-using Sarhne.DAL.Entities;
+﻿using Sarhne.DAL.Database;
 using Sarhne.DAL.Repository.Interfaces;
 
 namespace Sarhne.DAL.Repository.Implementation;

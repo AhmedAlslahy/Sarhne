@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Sarhne.BLL.DTOs.User;
-using Sarhne.BLL.DTOs.UserSetting;
-using Sarhne.BLL.Services.Interfaces;
-
-namespace Sarhne.API.Controllers;
+﻿namespace Sarhne.API.Controllers;
 
 [Route("api/users")]
 [Authorize]

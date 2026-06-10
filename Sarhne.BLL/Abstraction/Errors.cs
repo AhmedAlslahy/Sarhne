@@ -1,6 +1,4 @@
-﻿using Sarhne.DAL.Enums;
-
-namespace Sarhne.BLL.Abstraction;
+﻿namespace Sarhne.BLL.Abstraction;
 
 public record Error(string Code, string Description, ErrorType? StatusCode)
 {

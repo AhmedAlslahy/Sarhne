@@ -1,18 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Sarhne.DAL.Entities;
 
-namespace Sarhne.DAL.Entities;
-
-public class Notification
+public class Notification : BaseEntity<int>
 {
-    public int Id { get; set; }
-
-    [MaxLength(50)]
     public required string Title { get; set; }
-
-    [MaxLength(100)]
     public string Body { get; set; } = string.Empty;
-
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public bool IsRead { get; set; } = false;
 
     //Relations

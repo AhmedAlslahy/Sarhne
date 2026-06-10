@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sarhne.DAL.Entities;
-
-namespace Sarhne.DAL.Configration;
+﻿namespace Sarhne.DAL.Configration;
 
 public class UserConfig : IEntityTypeConfiguration<User>
 {

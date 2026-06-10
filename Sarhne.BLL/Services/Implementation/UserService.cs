@@ -1,20 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Sarhne.BLL.Abstraction;
-using Sarhne.BLL.DTOs.User;
-using Sarhne.BLL.Errors;
-using Sarhne.BLL.Helper;
-using Sarhne.BLL.Services.Interfaces;
-using Sarhne.DAL.Entities;
-using System.Security.Cryptography;
-
+﻿
 namespace Sarhne.BLL.Services.Implementation;
-
-public class UserService(UserManager<User> userManager) : IUserService
+public class UserService(UserManager<User> userManager, SarhneDbContext context) : IUserService
 {
     public async Task<Result> AddAdminRole(string userId)
     {
         var user = await userManager.FindByIdAsync(userId);
-
         if (user == null)
         {
             return UserErrors.NotFound;
@@ -26,27 +16,24 @@ public class UserService(UserManager<User> userManager) : IUserService
         }
 
         await userManager.AddToRoleAsync(user, "Admin");
-
         return Result.Success();
     }
 
-    public async Task<Result> DeleteAsync(string userId)
+    public async Task<Result> DeleteAsync(string userId, CancellationToken cancellation = default)
     {
-        var user = await userManager.FindByIdAsync(userId);
-
+        var user = await context.Users.FindAsync(userId);
         if (user == null)
         {
             return UserErrors.NotFound;
         }
 
-        await userManager.DeleteAsync(user);
-
+        await context.Users.Where(u=>u.Id==userId).ExecuteDeleteAsync(cancellation);
         return Result.Success();
     }
 
-    public async Task<Result<IEnumerable<UserDetailsDto>>> GetAllAsync()
+    public async Task<Result<IEnumerable<UserDetailsDto>>> GetAllAsync(CancellationToken cancellation = default)
     {
-        var users = userManager.Users.ToList();
+        var users = await context.Users.ToListAsync(cancellation);
 
         var data = new List<UserDetailsDto>();
 
@@ -66,17 +53,16 @@ public class UserService(UserManager<User> userManager) : IUserService
                 ProfileViewsCount = user.ProfileViewsCount,
             });
         }
-
         return data;
     }
 
     public async Task<Result<UserDetailsDto>> GetByLinkAsync(string publicLink)
     {
-        var user = userManager.Users
+        var user = context.Users
             .FirstOrDefault(u => u.PublicLink == publicLink);
         if (user == null)
         {
-            return Result<UserDetailsDto>.Fail(UserErrors.NotFound);
+            return UserErrors.NotFound;
         }
 
         var data = new UserDetailsDto
@@ -94,13 +80,13 @@ public class UserService(UserManager<User> userManager) : IUserService
         };
 
         user.ProfileViewsCount++;
-        await userManager.UpdateAsync(user);
+        await context.SaveChangesAsync();
         return Result<UserDetailsDto>.Success(data);
     }
 
-    public async Task<Result> UpdateAsync(UserUpdateDto dto, string userId)
+    public async Task<Result> UpdateAsync(UserUpdateDto dto, string userId, CancellationToken cancellation = default)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await context.Users.FindAsync(userId);
         if (user == null)
         {
             return UserErrors.NotFound;
@@ -112,8 +98,9 @@ public class UserService(UserManager<User> userManager) : IUserService
         var uniqueNumber = RandomNumberGenerator.GetInt32(1000, 9999).ToString();
         user.PublicLink = dto.PublicLink + uniqueNumber;
         user.ImageUrl = dto.Image != null ? Upload.UploadFile("Photos", dto.Image) : null;
+        user.UpdatedAt = DateTime.UtcNow;
 
-        await userManager.UpdateAsync(user);
+        await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
 }

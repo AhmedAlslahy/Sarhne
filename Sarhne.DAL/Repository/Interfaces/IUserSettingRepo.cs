@@ -1,6 +1,4 @@
-﻿using Sarhne.DAL.Entities;
-
-namespace Sarhne.DAL.Repository.Interfaces;
+﻿namespace Sarhne.DAL.Repository.Interfaces;
 
 public interface IUserSettingRepo
 {

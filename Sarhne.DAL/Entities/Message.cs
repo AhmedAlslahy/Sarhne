@@ -1,18 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Sarhne.DAL.Entities;
 
-namespace Sarhne.DAL.Entities;
-
-public class Message
+public class Message : BaseEntity<int>
 {
-    public int Id { get; set; }
-
-    [MaxLength(200)]
     public string? Content { get; set; }
-
-    [MaxLength(500)]
     public string? PhotoUrl { get; set; }
-
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public bool IsRead { get; set; } = false;
     public bool IsStarred { get; set; } = false;
 

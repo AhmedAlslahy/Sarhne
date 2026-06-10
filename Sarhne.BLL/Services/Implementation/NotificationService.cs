@@ -1,14 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Sarhne.BLL.Abstraction;
-using Sarhne.BLL.DTOs.Notification;
-using Sarhne.BLL.Errors;
-using Sarhne.BLL.Services.Interfaces;
-using Sarhne.DAL.Entities;
-using Sarhne.DAL.Repository.Interfaces;
+﻿namespace Sarhne.BLL.Services.Implementation;
 
-namespace Sarhne.BLL.Services.Implementation;
-
-public class NotificationService(IUnitOfWork unitOfWork) : INotificationService
+public class NotificationService(SarhneDbContext context) : INotificationService
 {
     public async Task<Result> Send(SendNotificationDto dto, string userId, CancellationToken cancellation = default)
     {
@@ -20,14 +12,14 @@ public class NotificationService(IUnitOfWork unitOfWork) : INotificationService
             ReceiverId = dto.UserId
         };
 
-        await unitOfWork.Notifications.SendAsync(data);
-        await unitOfWork.SaveChangesAsync(cancellation);
+        await context.Notifications.AddAsync(data);
+        await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
 
     public async Task<Result<IEnumerable<NotificationDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation = default)
     {
-        var result = await unitOfWork.Notifications.GetAllByUserId(userId).ToListAsync(cancellation);
+        var result = await context.Notifications.Where(n => n.ReceiverId == userId).ToListAsync(cancellation);
         if (result.Count == 0)
         {
             return NotificationErrors.NotFound;
@@ -40,13 +32,12 @@ public class NotificationService(IUnitOfWork unitOfWork) : INotificationService
             CreatedAt = item.CreatedAt,
             Title = item.Title,
         });
-
         return Result<IEnumerable<NotificationDetailsDto>>.Success(data);
     }
 
     public async Task<Result<NotificationDetailsDto>> GetById(int id, string userId, CancellationToken cancellation = default)
     {
-        var result = await unitOfWork.Notifications.GetById(id, userId, cancellation);
+        var result = await context.Notifications.ById(id).FirstOrDefaultAsync(n => n.ReceiverId == userId, cancellation);
         if (result == null)
         {
             return NotificationErrors.NotFound;
@@ -55,7 +46,7 @@ public class NotificationService(IUnitOfWork unitOfWork) : INotificationService
         if (!result.IsRead)
         {
             result.IsRead = true;
-            await unitOfWork.SaveChangesAsync(cancellation);
+            await context.SaveChangesAsync(cancellation);
         }
         var data = new NotificationDetailsDto
         {
@@ -65,12 +56,11 @@ public class NotificationService(IUnitOfWork unitOfWork) : INotificationService
             CreatedAt = result.CreatedAt,
             Title = result.Title,
         };
-
         return data;
     }
 
     public async Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default)
     {
-        return await unitOfWork.Notifications.UnreadCountByUserIdAsync(userId, cancellation);
+        return await context.Notifications.CountAsync(n => n.ReceiverId == userId, cancellation);
     }
 }

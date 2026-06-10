@@ -1,7 +1,4 @@
-﻿using Sarhne.DAL.Enums;
-using Sarhne.BLL.Abstraction;
-
-namespace Sarhne.BLL.Helper;
+﻿namespace Sarhne.BLL.Helper;
 
 public static class HelperMethod
 {

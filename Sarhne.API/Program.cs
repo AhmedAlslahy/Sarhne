@@ -1,13 +1,26 @@
-using Sarhne.API.Extensions;
-using Sarhne.API.Data.Seed;
-
 var builder = WebApplication.CreateBuilder(args);
+
 builder.AddProjectConfiguration();
-builder.Services.AddProjectServices(builder.Configuration);
-
+builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddIdentityServices();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddValidationServices();
+builder.Services.AddCorsPolicy();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 //------------------------------------------------------------------------------------------
-
 var app = builder.Build();
+
+//Auto update database
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SarhneDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
+//Seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

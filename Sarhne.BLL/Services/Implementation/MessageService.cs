@@ -1,15 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Sarhne.BLL.Abstraction;
-using Sarhne.BLL.DTOs.Message;
-using Sarhne.BLL.Errors;
-using Sarhne.BLL.Helper;
-using Sarhne.BLL.Services.Interfaces;
-using Sarhne.DAL.Entities;
-using Sarhne.DAL.Repository.Interfaces;
+﻿namespace Sarhne.BLL.Services.Implementation;
 
-namespace Sarhne.BLL.Services.Implementation;
-
-public class MessageService(IUnitOfWork unitOfWork) : IMessageService
+public class MessageService(SarhneDbContext context) : IMessageService
 {
     public async Task<Result> CreateAsync(CreateMessageDto dto, string userId, CancellationToken cancellation)
     {
@@ -40,27 +31,27 @@ public class MessageService(IUnitOfWork unitOfWork) : IMessageService
             dataNotification.Body = "Sent an image";
         }
 
-        await unitOfWork.Messages.CreateAsync(messageData);
-        await unitOfWork.Notifications.SendAsync(dataNotification);
-        await unitOfWork.SaveChangesAsync(cancellation);
+        await context.Messages.AddAsync(messageData);
+        await context.Notifications.AddAsync(dataNotification);
+        await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
 
     public async Task<Result> StarredMessageById(int id, string userId, CancellationToken cancellation)
     {
-        var result = await unitOfWork.Messages.GetByIdAsync(id, userId);
+        var result = await context.Messages.FirstOrDefaultAsync(n => n.Id == id && n.ReceiverId == userId, cancellation);
         if (result == null)
         {
             return MessageErrors.NotFound;
         }
         result.IsStarred = !result.IsStarred;
-        await unitOfWork.SaveChangesAsync(cancellation);
+        await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
 
     public async Task<Result<MessageDetailsDto>> GetMessageById(int id, string userId, CancellationToken cancellation)
     {
-        var result = await unitOfWork.Messages.GetByIdAsync(id, userId);
+        var result = await context.Messages.ById(id).FirstOrDefaultAsync(n => n.ReceiverId == userId, cancellation);
         if (result == null)
         {
             return MessageErrors.NotFound;
@@ -77,7 +68,7 @@ public class MessageService(IUnitOfWork unitOfWork) : IMessageService
         if (!result.IsRead)
         {
             result.IsRead = true;
-            await unitOfWork.SaveChangesAsync(cancellation);
+            await context.SaveChangesAsync(cancellation);
         }
 
         return data;
@@ -85,102 +76,46 @@ public class MessageService(IUnitOfWork unitOfWork) : IMessageService
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllByUserId(string userId, CancellationToken cancellation)
     {
-        var query = unitOfWork.Messages.GetAllByUserId(userId);
-
-        var data = await query
-            .Select(item => new MessageDetailsDto
-            {
-                Id = item.Id,
-                IsRead = item.IsRead,
-                Content = item.Content,
-                CreatedAt = item.CreatedAt,
-                IsStarred = item.IsStarred,
-                PhotoUrl = item.PhotoUrl,
-            })
-            .ToListAsync(cancellation);
-
+        var data = await context.Messages.GetAll(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
         }
-
         return data;
     }
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation)
     {
-        var query = unitOfWork.Messages.GetAllStarredByUserId(userId);
-
-        var data = await query
-            .Select(item => new MessageDetailsDto
-            {
-                Id = item.Id,
-                IsRead = item.IsRead,
-                Content = item.Content,
-                CreatedAt = item.CreatedAt,
-                IsStarred = item.IsStarred,
-                PhotoUrl = item.PhotoUrl,
-            })
-            .ToListAsync(cancellation);
-
+        var data = await context.Messages.Where(n => n.IsStarred).GetAll(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
         }
-
         return data;
     }
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllUnreadByUserId(string userId, CancellationToken cancellation)
     {
-        var query = unitOfWork.Messages.GetAllUnreadByUserId(userId);
-
-        var data = await query
-            .Select(item => new MessageDetailsDto
-            {
-                Id = item.Id,
-                IsRead = item.IsRead,
-                Content = item.Content,
-                CreatedAt = item.CreatedAt,
-                IsStarred = item.IsStarred,
-                PhotoUrl = item.PhotoUrl,
-            })
-            .ToListAsync(cancellation);
-
+        var data = await context.Messages.Where(n => !n.IsRead).GetAll(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
         }
-
         return data;
     }
 
     public async Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default)
     {
-        return await unitOfWork.Messages.UnreadCountByUserIdAsync(userId, cancellation);
+        return await context.Messages.CountAsync(n => n.IsRead && n.ReceiverId == userId, cancellation);
     }
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllSenderByUserId(string userId, CancellationToken cancellation)
     {
-        var query = unitOfWork.Messages.GetAllSenderByUserId(userId);
-
-        var data = await query
-            .Select(item => new MessageDetailsDto
-            {
-                Id = item.Id,
-                IsRead = item.IsRead,
-                Content = item.Content,
-                CreatedAt = item.CreatedAt,
-                IsStarred = item.IsStarred,
-                PhotoUrl = item.PhotoUrl,
-            })
-            .ToListAsync(cancellation);
-
+        var data = await context.Messages.Where(m => m.SenderId == userId).GetAll(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
         }
-
         return data;
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Sarhne.BLL.Abstraction;
-
+﻿
 namespace Sarhne.BLL.Services.Interfaces;
 
 public interface IRoleService

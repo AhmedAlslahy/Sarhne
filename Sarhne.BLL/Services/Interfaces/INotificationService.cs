@@ -1,6 +1,4 @@
-﻿using Sarhne.BLL.Abstraction;
-using Sarhne.BLL.DTOs.Notification;
-
+﻿
 namespace Sarhne.BLL.Services.Interfaces;
 
 public interface INotificationService

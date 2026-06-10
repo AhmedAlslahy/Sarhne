@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Sarhne.DAL.Entities;
-
-namespace Sarhne.DAL.Database;
+﻿namespace Sarhne.DAL.Database;
 
 public class SarhneDbContext : IdentityDbContext<User>
 {

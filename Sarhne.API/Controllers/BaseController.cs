@@ -1,7 +1,3 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-using Sarhne.BLL.Abstraction;
-
 namespace Sarhne.API.Controllers;
 
 [ApiController]

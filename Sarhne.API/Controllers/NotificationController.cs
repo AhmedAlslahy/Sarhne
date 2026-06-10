@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Sarhne.BLL.Services.Interfaces;
-
-namespace Sarhne.API.Controllers;
+﻿namespace Sarhne.API.Controllers;
 
 [Route("api/Notifications")]
 [Authorize]
