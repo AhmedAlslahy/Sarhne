@@ -1,5 +1,4 @@
-﻿
-namespace Sarhne.BLL.Services.Implementation;
+﻿namespace Sarhne.BLL.Services.Implementation;
 
 public class UserSettingService(SarhneDbContext context) : IUserSettingService
 {
@@ -36,7 +35,6 @@ public class UserSettingService(SarhneDbContext context) : IUserSettingService
         result.AllowAnonymousMessages = dto.AllowAnonymousMessages;
         result.ShowLastSeen = dto.ShowLastSeen;
         result.ShowProfileViews = dto.ShowProfileViews;
-        result.UpdatedAt = DateTime.UtcNow;
         await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }

@@ -12,7 +12,7 @@ using Sarhne.DAL.Database;
 namespace Sarhne.DAL.Migrations
 {
     [DbContext(typeof(SarhneDbContext))]
-    [Migration("20260608150907_Init")]
+    [Migration("20260613200116_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -191,13 +191,16 @@ namespace Sarhne.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("Sarhne.DAL.Entities.Notification", b =>
@@ -232,13 +235,16 @@ namespace Sarhne.DAL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Sarhne.DAL.Entities.User", b =>
@@ -251,6 +257,15 @@ namespace Sarhne.DAL.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -271,6 +286,9 @@ namespace Sarhne.DAL.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastSeen")
                         .HasColumnType("datetime2");
@@ -323,6 +341,9 @@ namespace Sarhne.DAL.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -352,11 +373,17 @@ namespace Sarhne.DAL.Migrations
                     b.Property<bool>("AllowAnonymousMessages")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("ShowLastSeen")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ShowProfileViews")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -367,7 +394,7 @@ namespace Sarhne.DAL.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserSettings");
+                    b.ToTable("UserSettings", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

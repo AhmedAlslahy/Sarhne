@@ -23,3 +23,5 @@ global using Sarhne.BLL.Abstraction;
 global using Sarhne.BLL.DTOs.Message;
 global using Sarhne.BLL.DTOs.User;
 global using Sarhne.BLL.DTOs.UserSetting;
+global using Sarhne.API.Abstraction;
+global using Sarhne.DAL.Interceptors;

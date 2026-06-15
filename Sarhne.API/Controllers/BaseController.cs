@@ -16,7 +16,7 @@ public abstract class BaseController : ControllerBase
         if (!result.IsSuccess)
             return BadRequest(result.Failure);
 
-        return Ok();
+        return Ok(result.IsSuccess);
     }
 
     protected string userId =>

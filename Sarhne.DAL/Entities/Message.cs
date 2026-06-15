@@ -1,6 +1,8 @@
-﻿namespace Sarhne.DAL.Entities;
+﻿using Sarhne.DAL.Interfaces;
 
-public class Message : BaseEntity<int>
+namespace Sarhne.DAL.Entities;
+
+public class Message : BaseEntity<int>, IAuditable
 {
     public string? Content { get; set; }
     public string? PhotoUrl { get; set; }

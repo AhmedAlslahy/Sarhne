@@ -12,7 +12,7 @@ public class NotificationService(SarhneDbContext context) : INotificationService
             ReceiverId = dto.UserId
         };
 
-        await context.Notifications.AddAsync(data);
+        context.Notifications.Add(data);
         await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
@@ -61,6 +61,6 @@ public class NotificationService(SarhneDbContext context) : INotificationService
 
     public async Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default)
     {
-        return await context.Notifications.CountAsync(n => n.ReceiverId == userId, cancellation);
+        return await context.Notifications.CountAsync(n => !n.IsRead && n.ReceiverId == userId, cancellation);
     }
 }

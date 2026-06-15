@@ -1,6 +1,8 @@
-﻿namespace Sarhne.DAL.Entities;
+﻿using Sarhne.DAL.Interfaces;
 
-public class Notification : BaseEntity<int>
+namespace Sarhne.DAL.Entities;
+
+public class Notification : BaseEntity<int>, IAuditable
 {
     public required string Title { get; set; }
     public string Body { get; set; } = string.Empty;

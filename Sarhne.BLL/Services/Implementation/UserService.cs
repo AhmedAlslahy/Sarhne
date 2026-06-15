@@ -1,5 +1,5 @@
-﻿
-namespace Sarhne.BLL.Services.Implementation;
+﻿namespace Sarhne.BLL.Services.Implementation;
+
 public class UserService(UserManager<User> userManager, SarhneDbContext context) : IUserService
 {
     public async Task<Result> AddAdminRole(string userId)
@@ -27,7 +27,8 @@ public class UserService(UserManager<User> userManager, SarhneDbContext context)
             return UserErrors.NotFound;
         }
 
-        await context.Users.Where(u=>u.Id==userId).ExecuteDeleteAsync(cancellation);
+        context.Entry(user).State = EntityState.Deleted;
+        await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
 
@@ -97,8 +98,10 @@ public class UserService(UserManager<User> userManager, SarhneDbContext context)
         user.PhoneNumber = dto.PhoneNumber;
         var uniqueNumber = RandomNumberGenerator.GetInt32(1000, 9999).ToString();
         user.PublicLink = dto.PublicLink + uniqueNumber;
-        user.ImageUrl = dto.Image != null ? Upload.UploadFile("Photos", dto.Image) : null;
-        user.UpdatedAt = DateTime.UtcNow;
+        if (dto.Image != null)
+        {
+            user.ImageUrl = Upload.UploadFile("Photos", dto.Image);
+        }
 
         await context.SaveChangesAsync(cancellation);
         return Result.Success();

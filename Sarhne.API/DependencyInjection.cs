@@ -1,4 +1,6 @@
-﻿namespace Sarhne.API;
+﻿using Microsoft.Extensions.Options;
+
+namespace Sarhne.API;
 
 public static class DependencyInjection
 {
@@ -19,26 +21,34 @@ public static class DependencyInjection
 
     //Database
     public static IServiceCollection AddDatabase(
-     this IServiceCollection services,
-     IConfiguration configuration)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddDbContext<SarhneDbContext>(options =>
+        services.AddDbContext<SarhneDbContext>((sp, options) =>
+        {
             options.UseSqlServer(
-                configuration.GetConnectionString("ProjectConnection")));
+                configuration.GetConnectionString("ProjectConnection"));
+
+            options.AddInterceptors(
+                sp.GetRequiredService<AuditInterceptor>());
+        });
 
         return services;
     }
 
     // Services
     public static IServiceCollection AddApplicationServices(
-  this IServiceCollection services,
-  IConfiguration configuration)
+     this IServiceCollection services,
+     IConfiguration configuration)
     {
         services.Configure<JwtInformations>(
                 configuration.GetSection("JWTInformations"));
         services.Configure<EmailInformations>(
             configuration.GetSection("EmailInformations"));
 
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<AuditInterceptor>();
         services.AddScoped<IUserSettingService, UserSettingService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();

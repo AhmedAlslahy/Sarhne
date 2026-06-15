@@ -1,11 +1,15 @@
-﻿namespace Sarhne.DAL.Entities;
+﻿using Sarhne.DAL.Interfaces;
 
-public class User : AuditableUser
+namespace Sarhne.DAL.Entities;
+
+public class User : IdentityUser, IAuditable, ISoftDeletable
 {
     [NotNull]
     public override required string? UserName { get; set; }
+
     [NotNull]
     public override required string? Email { get; set; }
+
     public required string FullName { get; set; }
     public Gender Gender { get; set; } = Gender.Male;
     public string? ImageUrl { get; set; }
@@ -13,6 +17,14 @@ public class User : AuditableUser
     public string? ProfileDescription { get; set; }
     public DateTime? LastSeen { get; set; }
     public int ProfileViewsCount { get; set; } = 0;
+
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedById { get; set; }
+
     public string? OTP { get; set; }
     public DateTime? OTPExpire { get; set; }
 

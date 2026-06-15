@@ -31,8 +31,8 @@ public class MessageService(SarhneDbContext context) : IMessageService
             dataNotification.Body = "Sent an image";
         }
 
-        await context.Messages.AddAsync(messageData);
-        await context.Notifications.AddAsync(dataNotification);
+        context.Messages.Add(messageData);
+        context.Notifications.Add(dataNotification);
         await context.SaveChangesAsync(cancellation);
         return Result.Success();
     }
@@ -63,7 +63,7 @@ public class MessageService(SarhneDbContext context) : IMessageService
             Content = result.Content,
             CreatedAt = result.CreatedAt,
             IsStarred = result.IsStarred,
-            PhotoUrl = result.PhotoUrl,
+            PhotoUrl = result.PhotoUrl
         };
         if (!result.IsRead)
         {
@@ -86,7 +86,7 @@ public class MessageService(SarhneDbContext context) : IMessageService
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllStarredByUserId(string userId, CancellationToken cancellation)
     {
-        var data = await context.Messages.Where(n => n.IsStarred).GetAll(userId).ToListAsync(cancellation);
+        var data = await context.Messages.GetAllStarred(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
@@ -106,12 +106,12 @@ public class MessageService(SarhneDbContext context) : IMessageService
 
     public async Task<Result<int>> UnreadCountByUserId(string userId, CancellationToken cancellation = default)
     {
-        return await context.Messages.CountAsync(n => n.IsRead && n.ReceiverId == userId, cancellation);
+        return await context.Messages.CountAsync(n => n.ReceiverId == userId && !n.IsRead, cancellation);
     }
 
     public async Task<Result<IEnumerable<MessageDetailsDto>>> GetAllSenderByUserId(string userId, CancellationToken cancellation)
     {
-        var data = await context.Messages.Where(m => m.SenderId == userId).GetAll(userId).ToListAsync(cancellation);
+        var data = await context.Messages.GetAllSender(userId).ToListAsync(cancellation);
         if (data.Count == 0)
         {
             return MessageErrors.NotFound;
